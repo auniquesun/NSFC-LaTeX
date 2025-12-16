@@ -246,9 +246,11 @@ Research on Retrieval-augmented Test-time Adaptation for Point Cloud Analysis in
 \textbf{开放环境下点云处理}
 目前仍有比较大的问题，这方面讲一讲
 
-Point-Cache, Point-PRC, PPT, 
+识别：Point-Cache, Point-PRC, PPT, 
 
-OV-3DET, ImOV3D, CoDA, CoDA v2
+检测：CLIP2 (Clip2: Contrastive language-image point pretraining from real-world point cloud data), PointCLIP V2, Detic (eccv 2022), OV-3DET, ImOV3D, CoDA, CoDA v2
+
+分割：Point-SAM (iclr 2025)
 
 \textbf{测试时自适应方法}
 读了不少这方面论文，系统性总结一下
@@ -271,7 +273,25 @@ need prompt learning? (CVPR 2024)
 
 \textbf{缓存模型/检索增强方法}
 
-Tip-Adapter, CaFo, PointNN, Point-PEFT, BFTT3D, Point-Cache
+语言建模方面：
+Unbounded cache model for online language modeling with open vocabulary, neurips 2017
+Generalization through memorization: Nearest neighbor language models, iclr 2020
+Pointer sentinel mixture models, iclr 2017
+
+图像识别方面：
+Matching networks for one shot learning, neurips 2016
+A closer look at few-shot classification, iclr 2019
+Meta-baseline: Exploring simple meta-learning for few-shot learning, ICCV 2021
+Improving test-time adaptation via shift-agnostic weight regularization and nearest source prototypes, eccv 2022
+A simple cache model for image recognition. neurips 2018
+Prototypical networks for few-shot learning. neurips 2017
+Sus-x: Training-free name-only transfer of vision-language models, ICCV 2023
+Tip-Adapter, eccv 2022
+CaFo, CVPR 2023
+Test-time classifier adjustment module for model-agnostic domain generalization, neurips 2021
+TDA, CVPR 2024
+
+3D方面：Tip-Adapter, CaFo, PointNN, Point-PEFT, BFTT3D, Point-Cache, Uni-Adapter
 
 可以引用几个代表性图，形象的展示一些重要的背景知识，方便大同行理解。
 
