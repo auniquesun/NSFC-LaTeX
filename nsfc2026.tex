@@ -34,9 +34,9 @@
 
 
 %\if 0
-\begin{center}\bf\Large 开放环境下基于检索增强的测试时自适应点云分析方法研究 \\
+\begin{center}\bf\Large 开放环境下基于缓存模型的测试时自适应点云分析方法研究 \\
 
-Research on Retrieval-augmented Test-time Adaptation for Point Cloud Analysis in Open-end World 
+Research on Cache-based Test-time Adaptation for Point Cloud Analysis in Open-end World 
 \end{center}
 
 
@@ -115,23 +115,33 @@ Research on Retrieval-augmented Test-time Adaptation for Point Cloud Analysis in
 2017年，以PointNet~\cite{qi17pointnet,qi17pointnet2}为代表的深度点云处理方法横空出世，它们在点云物体识别、语义分割等
 任务上的性能大幅超越人工特征工程和传统机器学习方法，（用ModelNet举例子，比传统方法好多少）。经过多年的发展，深度点云处理方法在
 特定数据集（封闭设定）的性能趋于饱和（给出具体例子，发表了多少篇论文，性能增益不到 6\%），
-当前的研究重点已经从封闭的数据集设定迈向开放环境。
+从2022年开始，越来越多的工作关注开放环境下点云处理问题，比如开放词表的点云识别~\cite{zhang22pointclip,zhu23pointclip2,xue23ulip,xue24ulip2,liu23openshape,zhou24uni3d}、
+物体检测~\cite{zeng23clip2,zhu23pointclip2,lu23ov3det,cao23coda,yang24imov3d,cao25codav2}、语义分割，
+当前该领域的研究重点已经从封闭数据集的设定迈向开放环境，且逐渐成为国内外一个前沿研究问题。
 
-% 下面这段话和上面没有接起来，要接起来
-现实世界是开放和千变万化的，开放环境下点云处理是一个重要且实际的问题，近年来逐渐成为国内外一个前沿研究问题。
-但当前开放环境下点云处理方法未能良好应对千变万化的数据，
-模型性能明显偏弱，距离实际应用还有很大距离。
+% 进一步讲开放环境的点云理解现状，存在什么问题
+%   存在的挑战一句话就说完了，得扩充和丰富
+但当前开放环境下点云处理方法未能良好应对千变万化的数据，模型的准确性和鲁棒性非常脆弱（这里要举例子，至少目前看到这么多点云识别/检测的例子，准确性只有那么点），
+不能满足实际应用需求。例如，当前最好的开放词表的点云物体检测模型，在公开的ScanNet数据集上的平均精度 mean Average Precision (mAP@IoU$_{25}$) 仅为 22.72\%，
+而在封闭数据集上训练的3DETR~\cite{misra213detr}模型在ScanNet的 mAP 达到62.7\%，当前经过封闭数据训练的最佳方法~\cite{wang25dest}在ScanNet达到了 78.3\% mAP 的检测精度。
 
-本项目针对这些问题，提出开放环境下基于缓存模型的测试时自适应点云分析方法，致力于提升开放环境下点云分析方法的鲁棒性/泛化性/高效性。
-
+% 讲本项目思路
+%   解释本项目涉及到的关键技术，就是下面列的
+针对这些问题，本项目提出开放环境下基于缓存模型的测试时自适应点云分析方法，致力于提升开放环境下点云分析方法的鲁棒性和泛化能力。
 
 % 讲测试时自适应
-%   讲主要思想
-%   讲技术分类
+%   讲主要思想，这要结合文献
+尽管模型在训练阶段要尽可能学习各种情况，但现实世界是千变万化的，总有些新的数据特性在测试和部署阶段出现，
+此时训练好的模型不再具备大规模重训练可行性，对于测试环境的应变能力和自适应能力显得尤为重要。
+而测试时自适应技术旨在让模型在线运行时具备适应测试环境或根据测试数据特点调整自身预测的能力~\cite{yeo23rna}。
+%   讲技术分类，也要总结文献
+测试时自适应技术可大致分为两类，一类是需要根据测试样本调整预训练模型参数的~\cite{schneider20improving,wang21tent,zhang21adaptive,zhang22memo,shu22tpt,feng23difftpt,niu23towards,chen22adacontrastive,zhao2024rlcf}，另外一类是免训练的~\cite{wang24bftt3d,karmanov24tda,zanella24on,farina24zero,sun25pointcache,tamjidi2025uniadapter}。在第一大类方法中，有调整BN层统计信息的~\cite{schneider20improving,wang21tent,zhang22memo}，有调整提示词的~\cite{shu22tpt,feng23difftpt}，还有调整模型其他部分参数（如图像编码器）的~\cite{zhang21adaptive,chen22adacontrastive,zhao2024rlcf}；在第二大类方法中，大部分是基于缓存模型的~\cite{wang24bftt3d,karmanov24tda,sun25pointcache,tamjidi2025uniadapter}，还有些经过理论推导进行数值变换的~\cite{zanella24on,farina24zero}。
 
 % 讲缓存模型——测试时自适应方法的一种
 %   讲主要思想
+缓存模型通过存储代表性样本
 %   讲存在的问题？
+%   文献总结好了，怎么讲呢？
 %   讲本文如何看待缓存模型  ->  检索增强范式
 
 \subsubsection{小节2}
