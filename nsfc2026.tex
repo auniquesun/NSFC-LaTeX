@@ -36,7 +36,7 @@
 %\if 0
 \begin{center}\bf\Large 开放环境下基于缓存模型的测试时自适应点云分析方法研究 \\
 
-Research on Cache-based Test-time Adaptation for Point Cloud Analysis in Open-end World 
+Research on Cache-based Test-time Adaptation for Point Cloud Analysis in Open World 
 \end{center}
 
 
@@ -106,7 +106,6 @@ Research on Cache-based Test-time Adaptation for Point Cloud Analysis in Open-en
 
 \subsection{研究背景及科学意义}
 
-\subsubsection{小节1}
 % 从这几方面展开，提供参考文献
 % 讲开放环境点云处理
 %   讲明白过去的范式是怎么样的？特定数据集上训练模型，特定数据集上测试
@@ -138,52 +137,53 @@ Research on Cache-based Test-time Adaptation for Point Cloud Analysis in Open-en
 测试时自适应技术可大致分为两类，一类是需要根据测试样本调整预训练模型参数的~\cite{schneider20improving,wang21tent,zhang21adaptive,zhang22memo,shu22tpt,feng23difftpt,niu23towards,chen22adacontrastive,zhao2024rlcf}，另外一类是免训练的~\cite{wang24bftt3d,karmanov24tda,zanella24on,farina24zero,sun25pointcache,tamjidi2025uniadapter}。在第一大类方法中，有调整BN层统计信息的~\cite{schneider20improving,wang21tent,zhang22memo}，有调整提示词的~\cite{shu22tpt,feng23difftpt}，还有调整模型其他部分参数（如图像编码器）的~\cite{zhang21adaptive,chen22adacontrastive,zhao2024rlcf}；在第二大类方法中，大部分是基于缓存模型的~\cite{wang24bftt3d,karmanov24tda,sun25pointcache,tamjidi2025uniadapter}，还有些经过理论推导进行数值变换的~\cite{zanella24on,farina24zero}。
 
 % 讲缓存模型——测试时自适应方法的一种
-%   讲主要思想
-缓存模型通过存储代表性样本
-%   讲存在的问题？
-%   文献总结好了，怎么讲呢？
+%   讲主要思想，就这一句话吗？不止这样吧，没把精华讲出来
+缓存模型通过存储典型样本数据为模型在评测和部署时作参考。
+%   讲技术路线分类？
+这种思路和技术手段已在多种任务重得到体现和应用，比如语言建模~\cite{vinyals16mn,grave17unbounded,merity17pointer,khandelwal20generalization}、图像识别~\cite{vinyals16mn,snell17prototypical,finn17maml,chen18a,chen21meta-baseline,choi22improving,iwasawa21t3a,zhang22tip-adapter,zhang23cafo,karmanov24tda}、点云处理~\cite{zhang23pointnn,tang24pointpeft,sun25pointcache,wang24bftt3d,tamjidi2025uniadapter}。
 %   讲本文如何看待缓存模型  ->  检索增强范式
 
-\subsubsection{小节2}
+% 讲存在的问题？
+%   评述总结，该把这部分写出来了，不能磨了
+%   1. TTA 存在很多假设，限制了实际应用
+%   2. TTA 效率低，不能实时运行
+%   3. 缓存模型依赖训练数据构建
+然而，当前的测试时自适应点云分析方法面临以下几方面挑战：
+%   分别对应后面的主要研究内容
+%   最后一定要有对挑战的总结描述
+\begin{itemize}
+    \item 当前测试时自适应点云分析方法大多限定在封闭数据集设置，仅能处理训练过程已经见过的物体和场景类型，不具备应对开放环境的自适应能力。
+    \item 当前测试时自适应点云分析方法依赖大规模训练数据构建缓存，但是模型测试和部署阶段获取大量训练数据不太实际，而且测试数据展示的特性和训练数据可能很不相同，导致这类方法的鲁棒性和泛化能力较弱，且运行效率不高，难以投入实际应用。
+    \item 当前开放环境下测试时自适应点云分析方法的研究处于早期阶段，基础理论尚不完备，关键方法和技术路线尚不成熟。
+\end{itemize}
 
+综上所述，开放环境下测试时点云处理的研究处于起步阶段，相关基础理论有待发展，对应技术路径亟待验证。本项目计划从理论和实践两个维度展开研究：
 
-\subsubsection{小节3}
+（1）从理论角度出发，开放环境下测试时自适应点云分析方法理论框架尚不清晰。
 
+（2）从应用角度出发，缓存模型构建和更新不够准确和高效。
 
-\subsection{研究挑战}
+（3）从应用角度出发，开放环境下基于缓存模型的测试时自适应点云分析方法未形成体系。
 
-提出3-4个挑战，分别对应后面的主要研究内容，最后一定要有对挑战的总结描述，例如
+\subsection{本人具备的研究基础}
 
+本人博士期间围绕3D点云处理的准确性、运行效率、鲁棒性和泛化性进行深入研究，广泛阅读了相关文献，熟悉主要技术路径和方法，提出系列创新方案,以第一作者身份在该主题并发表了5篇顶级国际会议和期刊论文，具备了较为扎实的研究基础。
+本人以第一作者发表在CVPR 2025的论文(Point-Cache)探讨了开放环境下点云识别模型测试时鲁棒性和泛化性问题；发表在 NeurIPS 2025 的论文(Point-PRC)探讨了3D大模型的领域泛化能力；发表在 ICRA 2024 的论文(PPT) 探讨了如何用参数和数据高效的方式激活多模态3D大模型的预训练知识，从而增强点云处理的效果和效率；发表在 ICRA 2023 的论文探讨了如何结合图像和点云两个模态的信息进行点云处理。
 
-\subsection{总结}
-
-说明课题组具有解决上述挑战的能力，例如：
-
-\myEmph{综上所述，***，本项目从***出发，面对***等挑战，
-研究***关键科学问题。
-项目拟在以下三方面开展研究：****}
-
-
-项目组在***具有扎实的研究基础，承担了多项国家和省部级课题， 典型的有：***。
-这些项目的完成，使项目组在***方面积累了丰富的研究经验，
-也为该项目的实施奠定了良好的技术基础。
-
-本项目直接面向***国家战略，可以为***等重要应用提供核心技术支撑，
-对推进***的应用和发展具有重要的意义。
 
 \subsection{国内外相关工作}
 
 \textbf{开放环境下点云处理}
 目前仍有比较大的问题，这方面讲一讲
 
-识别：Point-Cache, Point-PRC, PPT, 
+识别：Point-Cache~\cite{sun25pointcache}, Point-PRC~\cite{sun24point-prc}, PPT~\cite{sun24ppt3d}, 
 
-检测：CLIP2 (Clip2: Contrastive language-image point pretraining from real-world point cloud data), PointCLIP V2, Detic (eccv 2022), OV-3DET, ImOV3D, CoDA, CoDA v2
+检测：CLIP2~\cite{zeng23clip2} (Clip2: Contrastive language-image point pretraining from real-world point cloud data), PointCLIP V2~\cite{zhu23pointclip2}, OV-3DET~\cite{lu23ov3det}, ImOV3D~\cite{yang24imov3d}, CoDA~\cite{cao23coda}, CoDA v2~\cite{cao25codav2}
 
-分割：Point-SAM (iclr 2025)
+分割：Point-SAM~\cite{zhou2025pointsam}
 
 \textbf{测试时自适应方法}
-读了不少这方面论文，系统性总结一下
+(根据Point-Cache这篇文章的思路，分类总结)
 
 2D方面相关工作: Memo, TTT-MAE (Test-Time Training with Masked Autoencoders, neurips 2022) 
 Test-time classifier adjustment module for model-agnostic domain generalization (neurips 2021)
@@ -220,8 +220,9 @@ Tip-Adapter, eccv 2022
 CaFo, CVPR 2023
 Test-time classifier adjustment module for model-agnostic domain generalization, neurips 2021
 TDA, CVPR 2024
+Tip-Adapter, CaFo, 
 
-3D方面：Tip-Adapter, CaFo, PointNN, Point-PEFT, BFTT3D, Point-Cache, Uni-Adapter
+3D方面：PointNN, Point-PEFT, BFTT3D, Point-Cache, Uni-Adapter
 
 可以引用几个代表性图，形象的展示一些重要的背景知识，方便大同行理解。
 
@@ -318,6 +319,10 @@ TDA, CVPR 2024
 
 \NsfcSection{1}{研究基础}{
 （与本项目相关的研究工作积累和已取得的研究工作成绩）；}
+
+申请人自2017年开始从事基于深度学习的计算机视觉和三维视觉相关研究工作，具备扎实的理论基础和丰富的实践经验，取得了一些理论和应用创新成果。申请人的博士学位论文《多视图多模态三维物体理解关键技术研究》获评中国人民大学2025年度优秀博士学位论文，申请人于2023年获得国家留学基金委公派留学奖学金,后赴澳大利亚莫纳什大学（Monash University）数据科学与人工智能系进行为期一年的博士联合培养，联培期间的研究方向仍是三维视觉和点云处理，合作导师为蔡剑飞教授（Prof. Jianfei Cai），与蔡剑飞教授团队建立了良好而深入的合作关系。
+
+本人博士期间围绕3D点云处理的准确性、运行效率、鲁棒性和泛化性进行深入研究，广泛阅读了相关文献，熟悉主要技术路径和方法，提出系列创新方案并发表了系列高水平论文，在该领域具备扎实的研究基础。例如，本人以第一作者发表在 CVPR 2025 的论文提出《Point-Cache: Test-time Dynamic and Hierarchical Cache for Robust and Generalizable Point Cloud Analysis》提出了一个动态和分层缓存模型，大幅改善了3D点云处理模型在测试/部署阶段的鲁棒性和泛化能力；以第一作者发表在 NeurIPS 2024 的论文《Point-PRC: A Prompt Learning Based Regulation Framework for Generalizable Point Cloud Analysis》提出了一种基于提示学习的即插即用的监管框架，该框架能无缝集成到不同多模态3D大模型中，在增强点云处理下游任务性能的同时，改善多模态3D大模型在未知点云数据的泛化能力；以第一作者发表在 TVCG 2025 的论文《VSFormer: Mining Correlations in Flexible View Set for Multi-view 3D Shape Understanding》设计了一种灵活的3D物体多视图关系建模方法，增强了不同视图间的信息流动和交互，提升了3D物体建模和识别的准确性；以第一作者发表在 ICRA 2024 的论文《Parameter-efficient Prompt Learning for 3D Point Cloud Understanding》提出了一种参数和数据双重高效的提示学习方法，仅用极少训练参数和数据样本就能激活多模态3D大模型丰富的预训练知识，显著提升了模型在点云处理任务中的准确性和运行效率；以第一作者发表在 ICRA 2023 的论文《ViPFormer: Efficient Vision-and-Pointcloud Transformer for Unsupervised Pointcloud Understanding》提出了一种无监督预训练模型架构，该架构能有效融合图像和点云多模态数据信息，促进点云处理下游任务取得更好效果，同时提升下游任务的运行效率。
 
 以我本人的第一个国基金项目的\myEmph{申请原文为例}，通过高度精炼的语言，
 在2页左右的篇幅中快速讲清楚：1）大部分申请人没有的特色优势是什么；
