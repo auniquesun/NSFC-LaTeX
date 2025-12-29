@@ -34,9 +34,9 @@
 
 
 %\if 0
-\begin{center}\bf\Large 开放环境下基于缓存模型的测试时自适应点云分析方法研究 \\
+\begin{center}\bf\Large 开放环境下3D点云分析测试时自适应方法研究 \\
 
-Research on Cache-based Test-time Adaptation for Point Cloud Analysis in Open World 
+Research on Test-time Adaptation for 3D Point Cloud Analysis in Open World 
 \end{center}
 
 
@@ -121,8 +121,8 @@ Research on Cache-based Test-time Adaptation for Point Cloud Analysis in Open Wo
 % 进一步讲开放环境的点云理解现状，存在什么问题
 %   存在的挑战一句话就说完了，得扩充和丰富
 但当前开放环境下点云处理方法未能良好应对千变万化的数据，模型的准确性和鲁棒性非常脆弱（这里要举例子，至少目前看到这么多点云识别/检测的例子，准确性只有那么点），
-不能满足实际应用需求。例如，当前最好的开放词表的点云物体检测模型，在公开的ScanNet数据集上的平均精度 mean Average Precision (mAP@IoU$_{25}$) 仅为 22.72\%，
-而在封闭数据集上训练的3DETR~\cite{misra213detr}模型在ScanNet的 mAP 达到62.7\%，当前经过封闭数据训练的最佳方法~\cite{wang25dest}在ScanNet达到了 78.3\% mAP 的检测精度。
+不能满足实际应用需求。例如，当前最好的开放词表的点云物体检测模型 CoDA v2~\cite{cao25codav2}，在公开的ScanNet数据集上的平均精度 mean Average Precision (mAP@IoU$_{25}$) 仅为 22.72\%，
+而在封闭数据集上训练的3DETR~\cite{misra213detr}模型在ScanNet的 mAP@IoU$_{25}$ 达到62.7\%，当前经过封闭数据训练的最佳方法Dest~\cite{wang25dest}在ScanNet达到了 78.3\% mAP@IoU$_{25}$ 的检测精度，领先CoDA v2 55.58\%个绝对点。
 
 % 讲本项目思路
 %   解释本项目涉及到的关键技术，就是下面列的
@@ -134,7 +134,7 @@ Research on Cache-based Test-time Adaptation for Point Cloud Analysis in Open Wo
 此时训练好的模型不再具备大规模重训练可行性，对于测试环境的应变能力和自适应能力显得尤为重要。
 而测试时自适应技术旨在让模型在线运行时具备适应测试环境或根据测试数据特点调整自身预测的能力~\cite{yeo23rna}。
 %   讲技术分类，也要总结文献
-测试时自适应技术可大致分为两类，一类是需要根据测试样本调整预训练模型参数的~\cite{schneider20improving,wang21tent,zhang21adaptive,zhang22memo,shu22tpt,feng23difftpt,niu23towards,chen22adacontrastive,zhao2024rlcf}，另外一类是免训练的~\cite{wang24bftt3d,karmanov24tda,zanella24on,farina24zero,sun25pointcache,tamjidi2025uniadapter}。在第一大类方法中，有调整BN层统计信息的~\cite{schneider20improving,wang21tent,zhang22memo}，有调整提示词的~\cite{shu22tpt,feng23difftpt}，还有调整模型其他部分参数（如图像编码器）的~\cite{zhang21adaptive,chen22adacontrastive,zhao2024rlcf}；在第二大类方法中，大部分是基于缓存模型的~\cite{wang24bftt3d,karmanov24tda,sun25pointcache,tamjidi2025uniadapter}，还有些经过理论推导进行数值变换的~\cite{zanella24on,farina24zero}。
+测试时自适应技术可大致分为两类，一类是需要根据测试样本调整预训练模型参数的~\cite{schneider20improving,wang21tent,zhang21adaptive,zhang22memo,shu22tpt,feng23difftpt,niu23towards,chen22adacontrastive,zhao2024rlcf}，另外一类是免训练的~\cite{wang24bftt3d,karmanov24tda,zanella24meanshift,farina24zero,sun25pointcache,tamjidi2025uniadapter}。在第一大类方法中，有调整BN层统计信息的~\cite{schneider20improving,wang21tent,zhang22memo}，有调整提示词的~\cite{shu22tpt,feng23difftpt}，还有调整模型其他部分参数（如图像编码器）的~\cite{zhang21adaptive,chen22adacontrastive,zhao2024rlcf}；在第二大类方法中，大部分是基于缓存模型的~\cite{wang24bftt3d,karmanov24tda,sun25pointcache,tamjidi2025uniadapter}，还有些经过理论推导进行数值变换的~\cite{zanella24meanshift,farina24zero}。
 
 % 讲缓存模型——测试时自适应方法的一种
 %   讲主要思想，就这一句话吗？不止这样吧，没把精华讲出来
@@ -167,67 +167,125 @@ Research on Cache-based Test-time Adaptation for Point Cloud Analysis in Open Wo
 
 \subsection{本人具备的研究基础}
 
-本人博士期间围绕3D点云处理的准确性、运行效率、鲁棒性和泛化性进行深入研究，广泛阅读了相关文献，熟悉主要技术路径和方法，提出系列创新方案,以第一作者身份在该主题并发表了5篇顶级国际会议和期刊论文，具备了较为扎实的研究基础。
-本人以第一作者发表在CVPR 2025的论文(Point-Cache)探讨了开放环境下点云识别模型测试时鲁棒性和泛化性问题；发表在 NeurIPS 2025 的论文(Point-PRC)探讨了3D大模型的领域泛化能力；发表在 ICRA 2024 的论文(PPT) 探讨了如何用参数和数据高效的方式激活多模态3D大模型的预训练知识，从而增强点云处理的效果和效率；发表在 ICRA 2023 的论文探讨了如何结合图像和点云两个模态的信息进行点云处理。
+本人博士期间围绕3D点云处理的准确性、运行效率、鲁棒性和泛化性进行深入研究，广泛阅读了领域文献，熟悉并掌握了主要技术路径和方法，提出了系列创新方案，以第一作者身份围绕该主题发表了5篇顶级国际会议和期刊论文~\cite{sun25pointcache,sun24point-prc,sun25vsformer,sun24ppt3d,sun23vipformer}，初步具备了执行本项目的研究基础和实践经验。
+其中，发表在CVPR 2025的论文(Point-Cache)探讨了开放环境下点云识别模型测试时鲁棒性和泛化性问题；发表在 NeurIPS 2025 的论文(Point-PRC)探讨了3D大模型的领域泛化能力；发表在 ICRA 2024 的论文(PPT) 探讨了如何用参数和数据高效的方式激活多模态3D大模型的预训练知识，从而增强点云处理的效果和效率；发表在 ICRA 2023 的论文探讨了如何结合图像和点云两个模态的信息增强点云处理的性能和效率。
 
+% 研究基础总结
+本人将充分利用这些工作积累，深入研究开放环境下3D点云模型测试时自适应问题，努力突破其中的关键科学问题和技术挑战，给出适合3D点云大模型自适应部署的理论和实践方案，为Spatial AI的发展贡献力量。本项目预期产出的研究成果对于3D场景重建、3D物体生成、3D物体配准、VR/AR等领域也具有重要参考价值。
 
 \subsection{国内外相关工作}
 
-\textbf{开放环境下点云处理}
-目前仍有比较大的问题，这方面讲一讲
+\textbf{开放环境下3D点云处理}
+% 从哪讲起呢？把事情发展的原委讲出来，配上自身评述
 
-识别：Point-Cache~\cite{sun25pointcache}, Point-PRC~\cite{sun24point-prc}, PPT~\cite{sun24ppt3d}, 
+近几年，以CLIP~\cite{radford21clip}和ALIGN为~\cite{jia21scaling}代表的视觉-语言对比预训练方法受到了广泛关注，在这种思路指导下训练的模型能进行开放集合的图像理解（如图像识别/语义分割/物体检测），并且表现出显著改善的泛化能力，极大扩展了之前仅在图像单一模态训练的模型的能力边界（后者仅能处理训练阶段见过的物体/语义类别）。受到这类工作的启发，开放环境下3D点云处理的研究逐渐兴起，当前呈现出蓬勃发展的趋势。
 
-检测：CLIP2~\cite{zeng23clip2} (Clip2: Contrastive language-image point pretraining from real-world point cloud data), PointCLIP V2~\cite{zhu23pointclip2}, OV-3DET~\cite{lu23ov3det}, ImOV3D~\cite{yang24imov3d}, CoDA~\cite{cao23coda}, CoDA v2~\cite{cao25codav2}
+% 怎么和上述概览的逻辑接起来
+%   介绍典型任务分类
+开放环境下3D点云处理典型的任务包括3D点云识别~\cite{zhang22pointclip,zhu23pointclip2,sun25pointcache,sun24point-prc,sun24ppt3d,xue23ulip,xue24ulip2,liu23openshape,zhou24uni3d}、
+% PointCLIP~\cite{zhang22pointclip},Point-Cache~\cite{sun25pointcache}, Point-PRC~\cite{sun24point-prc}, PPT~\cite{sun24ppt3d}, ULIP~\cite{xue23ulip}, ULIP-2~\cite{xue24ulip2}, OpenShape~\cite{liu23openshape}, Uni3D~\cite{zhou24uni3d}
+3D点云物体检测~\cite{zeng23clip2,zhu23pointclip2,lu23ov3det,yang24imov3d,cao23coda,cao25codav2}、
+% CLIP2~\cite{zeng23clip2} (Clip2: Contrastive language-image point pretraining from real-world point cloud data), PointCLIP V2~\cite{zhu23pointclip2}, OV-3DET~\cite{lu23ov3det}, ImOV3D~\cite{yang24imov3d}, CoDA~\cite{cao23coda}, CoDA v2~\cite{cao25codav2}
+3D点云语义分割~\cite{jiang24ov3d,kolodiazhnyi2024oneformer3d,zhou2025pointsam,rusnak25haec,boudjoghra2025openyolo3d}等。
+% OV3D: Open-Vocabulary 3D Semantic Segmentation with Foundation Models~\cite{jiang24ov3d}
+% OneFormer3D~\cite{kolodiazhnyi2024oneformer3d}, 
+% Point-SAM~\cite{zhou2025pointsam}, 
+% HAECcity~\cite{rusnak25haec}
+% Open YOLO 3D~\cite{boudjoghra2025openyolo3d}, 
+%   总结每类任务特点 有什么特点呢？这就要自己琢磨了
+这几类任务起来有很大差异，从数据规模和复杂度层面，3D点云识别涉及到物体级的点云数据，规模和复杂度相对较小，而3D物体检测和语义分割要处理场景级的点云数据，规模和复杂度较大，因此不同任务的处理方法也有较大差异。
 
-分割：Point-SAM~\cite{zhou2025pointsam}
+%   评述这些工作与本项目的联系和区别
+然而，上述开放集合的点云处理方法缺乏自适应能力，无法根据测试环境特点作出自适应调整，极大限制了3D点云处理方法在开放环境和真实世界的部署应用。本项目正是针对这种缺陷，研究开放环境下3D点云处理的自适应方法，让3D模型能够高效的根据测试数据特点调整自身预测，从而改善模型的准确性和鲁棒性。
 
 \textbf{测试时自适应方法}
-(根据Point-Cache这篇文章的思路，分类总结)
+% 根据Point-Cache这篇文章的思路，分类总结
+%   分成哪几类呢？
+%   - 2D TTA：
+%       1. 非开放环境   <-  基于单模态   
+%       2. 开放环境     <-  多模态
+%       - 用不用按照实现方案把技术分个类？上面的2类太简单？
+%   - 3D TTA
+%       1. 基于小模型：鲁棒性和泛化能力本身不强+不是开放环境
+%       2. 依赖庞大训练集构建pipeline
+%       3. 未利用测试数据分布
 
-2D方面相关工作: Memo, TTT-MAE (Test-Time Training with Masked Autoencoders, neurips 2022) 
-Test-time classifier adjustment module for model-agnostic domain generalization (neurips 2021)
-TPT, DiffTPT, TDA, GDA: Generalized diffusion for robust test-time adaptation. (CVPR 2024), Zero, SNAP(neurips 2025),
-Do we really need to access the source data? Source hypothesis transfer for unsupervised domain adaptation. (icml 2020),
-Source data-absent unsupervised domain adaptation through hypothesis transfer and labeling transfer. (TPAMI 2022),
-TTT+ (neurips 2021),
-The norm must go on: Dynamic unsupervised domain adaptation by normalization. (CVPR 2022),
-Test-time training with self-supervision for generalization under distribution shifts.
+测试时自适应技术在图像处理领域已经得到体现和应用。早期的图像处理测试时自适应技术应用在图像单一模态~\cite{liang20shot,liang22source,wang21tent,zhang22memo,sun20ttt,liu21ttt++,gandelsman22ttt-mae,iwasawa21t3a,zhang22memo}，由于未引入灵活的语言模态，这类方法只能在封闭数据集上进行图像识别，不具备在真实开放世界中进行图像处理的能力。近年来，测试时自适应技术与主流视觉-语言模型结合，掀起了开放环境下多模态大模型测试时自适应方法研究的浪潮~\cite{shu22tpt,feng23difftpt,tsai24gda,karmanov24tda,zanella24meanshift,farina24zero,guan2025sca,cha2025snap}，这些工作大大突破了封闭数据集合的设定，使得视觉-语言多模态模型更加贴近实际应用。
 
-Tent: Fully test-time adaptation by entropy minimization (iclr 2020),
+% ====== 2D TTA: uni-modal, close set ======
+    % Memo~\cite{zhang22memo}
 
-On the test-time zeroshot generalization of vision-language models: Do we really
-need prompt learning? (CVPR 2024)
+    % Test-time classifier adjustment module for model-agnostic domain generalization~\cite{iwasawa21t3a} (neurips 2021)
 
-3D方面相关工作: MATE, BFTT3D, CloudFixer, Point-Cache, Uni-Adapter
+    % Tent: Fully test-time adaptation by entropy minimization~\cite{wang21tent} (iclr 2020),
 
-\textbf{缓存模型/检索增强方法}
+    % Do we really need to access the source data? Source hypothesis transfer for unsupervised domain adaptation.~\cite{liang20shot} (icml 2020),
+
+    % Source data-absent unsupervised domain adaptation through hypothesis transfer and labeling transfer.~\cite{liang22source} (TPAMI 2022),
+
+    % TTT: Test-time training with self-supervision for generalization under distribution shifts.~\cite{sun20ttt}
+
+    % TTT++~\cite{liu21ttt++} (neurips 2021),
+    % The norm must go on: Dynamic unsupervised domain adaptation by normalization.~\cite{mirza22dua} (CVPR 2022),
+
+    % TTT-MAE~\cite{gandelsman22ttt-mae} (Test-Time Training with Masked Autoencoders, neurips 2022) 
+
+% ====== 2D TTA: multi-modal, open set ======
+    % TPT, DiffTPT, TDA, 
+    % GDA: Generalized diffusion for robust test-time adaptation.~\cite{tsai24gda} (CVPR 2024), 
+
+    % On the test-time zeroshot generalization of vision-language models: Do we really need prompt learning?~\cite{zanella24meanshift} (CVPR 2024)
+
+    % Zero~\cite{farina24zero}, SCA~\cite{guan2025sca}, SNAP~\cite{cha2025snap}
+
+与在图像处理领域的探索相比，3D点云测试时自适应技术起步较晚，相关研究仍属于早期阶段。当前的技术流派可大致划分为三大类：第一类是基于小模型的方法~\cite{mirza23mate,wang24bftt3d,shim24cloudfixer}，这类方法首先仅局限于点云模态，缺乏开放集合的3D点云处理能力，其次由于模型本身能力有限，虽有测试时自适应技术加持，但展现的准确性和泛化能力不够；第二类是基于多模态大模型的方法~\cite{sun25pointcache,tamjidi2025uniadapter}，这类方法虽然能进行开放集合的点云处理，但是没有充分利用测试数据的分布特性（前/后面这段话是 **placehoder**），导致模型在现实世界测试和部署时鲁棒性和泛化能力仍不理想。
+
+% ====== 3D TTA ======
+% MATE, BFTT3D, CloudFixer, Point-Cache, Uni-Adapter
+
+% 相关工作总结，本项目的特色之处
+
+\textbf{缓存模型(检索增强方法，这么说不准确)}
+% 这部分放到测试时自适应中讲？还是单拎出来？
+% 目前标题中已经没有“缓存模型”的字样了，单拎出来有点突兀
 
 语言建模方面：
 Unbounded cache model for online language modeling with open vocabulary, neurips 2017
+
 Generalization through memorization: Nearest neighbor language models, iclr 2020
+
 Pointer sentinel mixture models, iclr 2017
 
 图像识别方面：
 Matching networks for one shot learning, neurips 2016
+
 A closer look at few-shot classification, iclr 2019
+
 Meta-baseline: Exploring simple meta-learning for few-shot learning, ICCV 2021
+
 Improving test-time adaptation via shift-agnostic weight regularization and nearest source prototypes, eccv 2022
+
 A simple cache model for image recognition. neurips 2018
+
 Prototypical networks for few-shot learning. neurips 2017
+
 Sus-x: Training-free name-only transfer of vision-language models, ICCV 2023
-Tip-Adapter, eccv 2022
-CaFo, CVPR 2023
+
+Tip-Adapter, eccv 2022 CaFo, CVPR 2023
+
 Test-time classifier adjustment module for model-agnostic domain generalization, neurips 2021
 TDA, CVPR 2024
-Tip-Adapter, CaFo, 
 
 3D方面：PointNN, Point-PEFT, BFTT3D, Point-Cache, Uni-Adapter
 
-可以引用几个代表性图，形象的展示一些重要的背景知识，方便大同行理解。
+\myEmph{采纳这个建议}
 
-可以对相关工作进行分组介绍。
-每组介绍之后简单总结一下现有工作和拟研究工作的关系。
+1. 可以引用几个代表性图，形象的展示一些重要的背景知识，方便大同行理解。
+
+2. 可以对相关工作进行分组介绍。
+
+3. 每组介绍之后简单总结一下现有工作和拟研究工作的关系。
+
 \myEmph{现有工作存在那些不足需要进一步研究。
 这些总结性的结论建议粗体强调，方便评审人迅速理解。}
 
@@ -337,83 +395,12 @@ IEEE CVPR 3篇，IEEE ICCV 2篇，IEEE TVCG 2篇），
 
 \subsection{图像的智能理解与新一代交互方面}
 
-\begin{figure}[ht]
-    \centering
-    \addImg[1]{figures/work.jpg}
-    \caption{图像智能理解与交互关键技术。}
-    \label{fig:interaction}
-\end{figure}
-
-对图像中的物体对象进行智能分析，从而实现基于语音、简单笔画等自然直观操作方式的图像编辑，
-是计算机图形学中的重要课题。
-如\figref{fig:interaction}所示，在该领域，
-申请人提出了基于图像场景物体的编辑技术
-(ACM TOG 2010 \cite{ChengZMHH10}，申请人为一作)，
-基于语音控制的图像分析技术 
-(ACM TOG 2014 \cite{cheng2014imagespirit}，申请人为一作)，
-基于草图和网络图像的图像合成技术
-(ACM TOG 2009 \cite{cheng2014imagespirit}，申请人为二作)。
-其中，图像合成技术于2010年被法国政府参与组织的国际互联网行业论坛评选为
-“全球互联网数字媒体领域十大创新性发明之一”并在法国参议院颁奖，
-成果介绍视频浏览百万次以上，并被英国《每日邮报》、
-德国《明镜周刊》等多家著名国际媒体撰文报道。
-英国《每日邮报》对该工作的评价为“An image manipulation tool built by a group 
-of Chinese students has taken the internet by storm”。
-该工作被科技部 \cite{sketch2PhotoMost} 
-\myEmph{作为973计划成功案例}予以报道（信息领域仅列出这一个案例）。
-申请人在该领域的CCF A类国际期刊ACM TOG（4篇）和IEEE TVCG（2篇）上发表多篇论文。
 
 \subsection{显著性物体检测方面}
-
-\begin{figure}[ht]
-    \centering
-    \addImg[1]{figures/sal.jpg}
-    \caption{视觉显著性物体检测与分割算法及其应用。}
-    \label{fig:salobj}
-\end{figure}
-
-申请人提出了一种基于全局对比度分析的图像视觉显著性区域检测算法。
-通过对图像区域间的全局对比度和空间相关性进行建模，
-该算法能够快速有效地检测并分割图像中的视觉显著性区域。
-在国际上现有最大的公开测试集上，该方法的检测结果优于已有方法，
-显著性区域分割结果的准确性从之前最好结果的正确率75\%、
-召回率83\% 提升到了正确率90\%、召回率90\% 。
-该成果自2011年在IEEE CVPR上发表之后（申请人为一作），源代码下载量2000余次，
-论文\myEmph{Google Scholar他引700+次}（其期刊版本被IEEE TPAMI 2015录用）。
-基于该工作的若干扩展性工作在IEEE ICCV 2013（申请人为一作），
-和SCI期刊The Visual Computer 2014（申请人为一作）上发表。
 
 
 \subsection{基于视觉注意机制的候选物体生成方面}
 
-\begin{figure}[ht]
-    \centering
-    \addImg[.8]{figures/Objectness.jpg}
-    \caption{图像中候选物体（object proposal）生成的快速机制。}
-    \label{fig:objectness}
-\end{figure}
-
-物体检测是计算机视觉领域最重要的核心问题。
-传统物体检测技术大多基于滑动窗口机制，非常耗时。
-近年来，通过对图像进行预分析，从而提取相对少量的图像窗口作为候选物体，
-并对这些候选物体进行分类从而达到检测目的的机制逐渐兴起。
-虽然这一机制可以极大地加速后续物体检测过程，
-并且通过使用强分类器提高检测正确率，但是现有方法比较耗时。
-申请人根据不同物体类别图像都具有封闭轮廓这一特性，
-提出了一种简单有效的方法解决这一问题。
-相对与该领域内已有代表性方法，新方法的计算效率提升了1000倍以上，
-并能得到更高的检测率。
-\figref{fig:objectness}所示工作被IEEE CVPR 2014录用为Oral 论文
-（录取率5\%，申请人为一作）。
-相关代码公开后一个月内下载量突破2000次。
-论文发表半年左右时间，已经被多个国际著名学者在论文或者大会报告中引用，
-包括：IEEE TPAMI主编 Forsyth教授、
-加州大学伯克利分校的 Malik教授（IEEE Fellow和ACM Fellow）、
-牛津大学 Vedaldi副教授（IEEE TPAMI Associate Editor）、
-瑞士联邦工学院的Gool教授等。
-申请人也因为这方面的工作被英国皇家学会院士Andrew Zisserman教授、
-剑桥大学Roberto Cipolla教授、新加坡国立大学颜水城教授等十余位著名学者邀请，
-分别去他们的研究组做报告。
 
 
 \subsection{研究工作获奖}
