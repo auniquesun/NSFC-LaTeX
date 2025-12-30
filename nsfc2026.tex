@@ -245,38 +245,40 @@ Research on Test-time Adaptation for 3D Point Cloud Analysis in Open World
 
 % 相关工作总结，本项目的特色之处
 
-\textbf{缓存模型(检索增强方法，这么说不准确)}
+\textbf{缓存模型(与检索增强方法类比，并不等同)}
 % 这部分放到测试时自适应中讲？还是单拎出来？
-% 目前标题中已经没有“缓存模型”的字样了，单拎出来有点突兀
+%   目前标题中已经没有“缓存模型”的字样了，单拎出来有点突兀，那就不讲
+%   不讲的话，其他地方要讲吗？研究内容部分肯定要讲
+%   我觉得至少按照 point-cache 逻辑写一段，迟早得写
+%       怎么写呢？讲一下思路，直接这么分有点粗略且无关
+%       到这写不出来啊，有两方面原因：一是觉得point-cache的创新有点旧了，二是还没找到有效的能work的方案。这也启发我要持续推动新研究。
+%           先按照point-cache的思路写一个，后面再改进升级
+缓存模型的思想是存储一些数据样本，例如样本的特征和标签，特征可以看作该样本的\emph{key}，标签可以看作对应的\emph{value}，这些存储的数据样本能被模型用作未来预测的重要参考。这种简单有效的技术思路已被广泛应用到人工智能和机器学习的各个领域，包括
+语言建模~\cite{grave17unbounded,merity17pointer,khandelwal20generalization}、
+    % Unbounded cache model for online language modeling with open vocabulary~\cite{grave17unbounded}, neurips 2017
+    % Pointer sentinel mixture models~\cite{merity17pointer}, iclr 2017
+    % Generalization through memorization: Nearest neighbor language models~\cite{khandelwal20generalization}, iclr 2020
+图像识别~\cite{vinyals16mn,snell17prototypical,chen18a,chen21meta-baseline,iwasawa21t3a,choi22improving,udandarao23sus-x,zhang22tip-adapter,zhang23cafo,karmanov24tda}、
+    % Matching networks for one shot learning~\cite{vinyals16mn}, neurips 2016
+    % Prototypical networks for few-shot learning~\cite{snell17prototypical}. neurips 2017
+    % A simple cache model for image recognition~\cite{orhan18a}. neurips 2018
+    % A closer look at few-shot classification~\cite{chen18a}, iclr 2019
+    % Meta-baseline: Exploring simple meta-learning for few-shot learning~\cite{chen21meta-baseline}, ICCV 2021
+    % Test-time classifier adjustment module for model-agnostic domain generalization~\cite{iwasawa21t3a}, neurips 2021
+    % Improving test-time adaptation via shift-agnostic weight regularization and nearest source prototypes~\cite{choi22improving}, eccv 2022
+    % Sus-x: Training-free name-only transfer of vision-language models~\cite{udandarao23sus-x}, ICCV 2023
+    % Tip-Adapter~\cite{zhang22tip-adapter}, eccv 2022 
+    % CaFo~\cite{zhang23cafo}, CVPR 2023
+    % TDA~\cite{karmanov24tda}, CVPR 2024
+3D点云处理~\cite{zhang23pointnn,tang24pointpeft,wang24bftt3d,sun25pointcache,tamjidi2025uniadapter}等任务。
+% PointNN~\cite{zhang23pointnn}, Point-PEFT~\cite{tang24pointpeft}, BFTT3D~\cite{wang24bftt3d}, Point-Cache~\cite{sun25pointcache}, Uni-Adapter~\cite{tamjidi2025uniadapter}
 
-语言建模方面：
-Unbounded cache model for online language modeling with open vocabulary, neurips 2017
+% 对缓存模型作评述
+%   每类有什么特点，和本项目的联系区别在哪？这是要害
+然而，当前的缓存模型还存在一些明显问题，比如（1）缓存模型的建立依赖大规模训练数据，但模型在测试和部署阶段不太可能再去获取和访问大量这样的数据；（2）缓存模型建立之后，缺乏数据样本动态更新机制，这种静态的缓存数据不能反映测试阶段数据的特性和分布，降低缓存模型的参考价值；（3）缓存模型的设计比较粗糙，对于复杂精细数据的刻画和存储能力有待提升。
 
-Generalization through memorization: Nearest neighbor language models, iclr 2020
-
-Pointer sentinel mixture models, iclr 2017
-
-图像识别方面：
-Matching networks for one shot learning, neurips 2016
-
-A closer look at few-shot classification, iclr 2019
-
-Meta-baseline: Exploring simple meta-learning for few-shot learning, ICCV 2021
-
-Improving test-time adaptation via shift-agnostic weight regularization and nearest source prototypes, eccv 2022
-
-A simple cache model for image recognition. neurips 2018
-
-Prototypical networks for few-shot learning. neurips 2017
-
-Sus-x: Training-free name-only transfer of vision-language models, ICCV 2023
-
-Tip-Adapter, eccv 2022 CaFo, CVPR 2023
-
-Test-time classifier adjustment module for model-agnostic domain generalization, neurips 2021
-TDA, CVPR 2024
-
-3D方面：PointNN, Point-PEFT, BFTT3D, Point-Cache, Uni-Adapter
+这些问题限制了缓存模型与测试时自适应方法的有效结合，使得基于缓存模型的3D点云自适应分析成为一大技术难点。为此，本项目提出了开放环境下基于测试时分层缓存模型的3D点云自适应分析解决方案，该方案设计的缓存模型（1）能够在线捕捉测试数据的分布特性，
+（2）引入了基于信息熵的选择机制动态更新缓存数据，使得缓存数据始终能反映最新数据特性，为模型整体决策提供更好参考，（3）针对3D点云数据开发了层次化样本特性表征方法，不仅记录样本整体特征，还记录样本多种局部信息，使得缓存模型更加精细准确。
 
 \myEmph{采纳这个建议}
 
@@ -391,17 +393,6 @@ TDA, CVPR 2024
 IEEE CVPR 3篇，IEEE ICCV 2篇，IEEE TVCG 2篇），
 \myEmph{论文Google Scholar他引1600+次，一作论文单篇最高他引700+次}。
 这些研究基础主要包括3个方面：
-
-
-\subsection{图像的智能理解与新一代交互方面}
-
-
-\subsection{显著性物体检测方面}
-
-
-\subsection{基于视觉注意机制的候选物体生成方面}
-
-
 
 \subsection{研究工作获奖}
 
