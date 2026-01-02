@@ -34,9 +34,9 @@
 
 
 %\if 0
-\begin{center}\bf\Large 开放环境下3D点云分析测试时自适应方法研究 \\
+\begin{center}\bf\Large 开放环境下检索增强的3D点云测试时自适应分析方法研究 \\
 
-Research on Test-time Adaptation for 3D Point Cloud Analysis in Open World 
+Research on Retrieval-augmented Test-time Adaptation for 3D Point Cloud Analysis in Open World 
 \end{center}
 
 
@@ -302,33 +302,41 @@ Research on Test-time Adaptation for 3D Point Cloud Analysis in Open World
 （此部分为重点阐述内容）；}
 
 \subsection{研究目标}
-
-
-重点阐述本项目计划\myEmph{做到什么程度}。
-一定要用大同行能够理解的术语来描述。
-
+% 重点阐述本项目计划\myEmph{做到什么程度}。
+总体目标：
 
 \subsection{研究内容}
+% 重点阐述本项目计划\myEmph{做什么}。
 
 
-重点阐述本项目计划\myEmph{做什么}。
 如\figref{fig:teaser}所示，建议撰写之前仔细画一个主要研究内容的图。
-我通常习惯用PowerPoint作图，做好后导出为pdf格式，既可以保持图片不会文件太大，也可以保证放大后非常清晰。
-幻灯片直接导出的pdf可能存在空白边，可以用WPS中的“页面-剪裁页面”去掉白边。
-作图用的pptx文件我也通常会保存起来，例如这个模版\LaTeX 文件中的“prepare/NSFC-Figs.pptx”。
-如果是大的国基金项目，后续可能涉及答辩。
-答辩时这个图可以用，保留pptx格式也方便到时候做尺寸和布局的调整。
+
+% \begin{figure}[ht]
+% 	\centering
+%     \begin{overpic}[width=0.8\columnwidth]{framework.pdf}
+%     \end{overpic}
+%     \caption{本项目主要研究内容。
+%     }\label{fig:teaser}
+% \end{figure}
+
+针对当前方法不能很好应对开放环境下3D点云数据的高度不确定性（物体类别数未知且动态变化、
+数据噪声大、分布差异大），点云特征表示不全面不准确，模型准确性和泛化性差等问题，
+本项目计划层层递进研究三方面内容：（1）开放环境下3D点云测试数据流特征编码；
+（2）开放环境下缓存模型的动态构建与更新；（3）开放环境下缓存模型驱动的3D点云自适应分析方法
+
+\begin{itemize}
+    \item 研究内容一：开放环境下3D点云测试数据流特征编码。
+\end{itemize}
 
 
-\begin{figure}[ht]
-	\centering
-    \begin{overpic}[width=0.8\columnwidth]{framework.pdf}
-    \end{overpic}
-    \caption{本项目主要研究内容。
-    }\label{fig:teaser}
-\end{figure}
+\begin{itemize}
+    \item 研究内容二：开放环境下缓存模型的动态构建方法与更新机制。针对在线测试数据的分布统计未被充分利用的问题，本项目计划研究一种轻量高效的缓存模型，用于记录在线测试数据的特征和分布特性用作未来参考，其中重点和难点在于如何根据在线测试数据流构建缓存模型并设计动态更新机制。
+\end{itemize}
 
 
+\begin{itemize}
+    \item 研究内容三：开放环境下缓存模型驱动的3D点云自适应分析方法。建立起缓存模型后，缓存模型中维护的点云样本特征和标签信息可作为知识锚点，在此基础上本项目计划研究一种检索增强技术，根据当前输入样本从缓存模型中检索相关领域知识，利用检索到的知识更新和校正3D点云分析模型原本预测，实现检索-增强目标。
+\end{itemize}
 
 
 \subsection{拟解决的关键科学问题}
@@ -344,13 +352,23 @@ Research on Test-time Adaptation for 3D Point Cloud Analysis in Open World
 如图\figref{fig:pipline}所示，建议在具体写技术路线之前，先厘清这个框架图。
 技术路线的框架图通常比研究内容更加饱满，可以更好的展示本项目的研究思路。
 
-\begin{figure}[ht]
-	\centering
-    \begin{overpic}[width=\columnwidth]{pipeline.pdf}
-    \end{overpic}
-    \caption{本项目的技术路线。
-    }\label{fig:pipline}
-\end{figure}
+% \begin{figure}[ht]
+% 	\centering
+%     \begin{overpic}[width=\columnwidth]{pipeline.pdf}
+%     \end{overpic}
+%     \caption{本项目的技术路线。
+%     }\label{fig:pipline}
+% \end{figure}
+
+\myEmph{缓存模型建立}
+
+点云特征编码
+
+点云标签生成
+
+
+
+\myEmph{缓存模型更新}
 
 
 \subsection{可行性分析}
@@ -397,18 +415,11 @@ IEEE CVPR 3篇，IEEE ICCV 2篇，IEEE TVCG 2篇），
 \subsection{研究工作获奖}
 
 
-\begin{figure}[ht]
-    \centering
-    \addImg[.8]{figures/awards.jpg}
-    \caption{图像中候选物体（object proposal）生成的快速机制。}
-    \label{fig:award}
-\end{figure}
-
-申请人在图像分析与编辑方面的初步工作获得了多项重要奖励，
-包括：Google PhD Fellowship (2010年亚洲地区共2人获奖)，
-北京市优秀博士论文（同年度清华大学56个系共有7人获得该奖项），
-英国皇家学会Newton International Fellowship提名，教育部自然科学奖一等奖，
-IBM PhD fellowship，北京市优秀博士毕业生，教育部博士研究生学术新人奖等奖项。
+申请人在空间智能和3D点云处理方面的初步工作获得了多项重要奖励，
+包括：Google Travel Grant，
+中国人民大学优秀博士论文，
+NeurIPS Scholar Award，
+中国人民大学优秀博士毕业生。
 这些初步研究中取得的成果为本项目取得进一步的创新性成果打下了坚实的基础。
 
 
