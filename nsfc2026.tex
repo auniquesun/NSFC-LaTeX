@@ -372,9 +372,15 @@ Research on Retrieval-augmented Test-time Adaptation for 3D Point Cloud Analysis
 \NsfcSection{3}{拟采取的研究方案及可行性分析}{
 （包括研究方法、技术路线、实验手段、关键技术等说明）；}
 
+\subsection{研究方法}
+本项目的研究方案和技术路线如\figref{fig:pipline}所示。
+% 要把环境设定讲出来，这是大前提
+本项目的情境设定：一个训练好的点云处理模型要在开放环境中测试和部署，模型的输入是源源不断的点云数据，即测试数据流，执行的是3D物体识别、物体检测、场景分割等点云分析任务，本项目的目标是增强点云处理模型在测试阶段的自适应能力，提升测试时准确性、鲁棒性、泛化能力。
+首先围绕开放环境下点云特征的高效提取与鲁棒表示、基于在线点云数据流的缓存模型高效构建和更新、基于缓存模型的点云处理测试时自适应机制三个关键科学问题展开理论分析；然后根据理论分析设计模型，并在公开点云数据集上开展测试，用测试结果迭代优化模型；最后根据项目整体目标，将设计的模型置于开放环境大规模点云数据测试，根据模型自适应结果优化和完善方法设计。
 
-\subsection{拟采取的技术路线}
+\subsection{技术路线}
 
+\subsubsection{点云特征编码}
 如图\figref{fig:pipline}所示，建议在具体写技术路线之前，先厘清这个框架图。
 技术路线的框架图通常比研究内容更加饱满，可以更好的展示本项目的研究思路。
 
@@ -386,16 +392,67 @@ Research on Retrieval-augmented Test-time Adaptation for 3D Point Cloud Analysis
 %     }\label{fig:pipline}
 % \end{figure}
 
-\myEmph{缓存模型建立}
+\myEmph{点云特征编码}
 
-点云特征编码
+\myEmph{点云标签生成}
 
-点云标签生成
+\subsubsection{分层缓存模型建立和更新}
 
+为了更全面刻画测试数据分布，本项目拟开发一种分层缓存模型来记录在线测试样本的特性。
+分层缓存模型包含一个全局缓存和一个局部缓存，前者存放点云样本整体信息，后者存放局部结构信息。这种由粗到细的结构能更好为测试数据进行特征画像，从而提供更精确鲁棒的特征表示。拟设计的分层模型可分如下步骤构建，参见算法~\ref{alg:hierar_cache_construction}。
 
+\myEmph{（1）全局缓存模型构建和更新}
 
-\myEmph{缓存模型更新}
+全局缓存用 $\textbf{C}_g = (\textbf{E}_g, \hat{\textbf{L}}_g, \textbf{h}_g)$ 三元组表示，分别对应点云数据的 (特征，标签，熵)。为了高效管理，拟设计一种选择机制将高质量测试样本优先放入缓存。
 
+构建：全局缓存按照样本类别存放物体，每个类别最多存放 $K$ 个物体。开始时，全局缓存为空，随着在线数据流的输入，为当前样本 $P$ 生成指纹三元组 ($\textbf{e}_p^g, \hat{L}, h$)并放置到类别$\hat{L}$中。
+
+更新：随着测试样本逐渐增加，首先要检查类别$\hat{L}$中存放的样本数是否达到上限$K$，如果未达到，则继续将当前样本放入对应类别；否则，在类别$\hat{L}$中找到熵最大的样本，将其与当前样本$P$的熵值比较，如果当前样本的熵更小，则用当前样本替换类别$\hat{L}$中熵最大的样本，否则不对缓存更新，继续处理下一个测试样本。当全局缓存容量达到上限时，$\textbf{E}_g \in \mathbb{R}^{CK\times d}$，$\hat{L}_g \in \mathbb{R}^{CK \times 1}$，$\hat{h}_g \in \mathbb{R}^{CK \times 1}$。
+
+\myEmph{（2）局部缓存模型构建和更新}
+
+尽管全局缓存包含了测试数据的整体分布信息，但缺乏对于点云局部结构的掌握，而这些局部结构信息对于物体识别、语义分割等点云分析任务比较关键。本项目拟设计局部缓存模型以解决这种限制。
+
+局部缓存用 $\textbf{C}_l = (\textbf{E}_l, \hat{\textbf{L}}_l)$ 表示，存储点云数据的局部特征和标签信息。与此对应，当个测试样本$P$的局部指纹信息表示为 ($\textbf{e}_p^l, \hat{L}$)，$\textbf{e}_p^l \in \mathbb{R}^{m\times d}$。
+
+构建与更新：局部缓存的样本选择机制遵循全局缓存的设计，即仅当测试样本的全局指纹被放入全局缓存时，它的局部指纹才能被放入局部缓存。因此，在局部指纹中不必重复存储对应样本的熵值$h$。当局部缓存存满时，$\textbf{E}_l \in \mathbb{R}^{(m\cdot C K)\times d}$，$\hat{L} \in \mathbb{R}^{CK \times 1}$。
+
+\subsubsection{基于缓存模型的测试时自适应}
+
+构建的分层缓存模型相当于一个具有丰富点云知识的在线知识库，本项目计划用该知识库来在线校准点云处理模型的预测，有效解决测试时发生的分布偏移、数据噪声问题。测试时自适应过程分为如下两个阶段：
+
+\myEmph{（1）基于全局缓存的测试时自适应}
+
+对于新来的测试样本 $Q$，它被当作一个查询来从全局缓存检索相关知识。具体来说，检索过程先要计算一个权重矩阵 $A_g$，这个矩阵表示 $Q$ 和缓存特征 $\textbf{E}_g$ 的相似度。这让新的测试样本与全局缓存数据建立了联系，更意味着初步理解了线测试数据的上下文。然后利用$A_g$对缓存的测试数据标签信息$\hat{L}_g$生成全局缓存的自适应信号 $\hat{\textbf{y}}_g$。上述过程可以用公式\ref{eq:global_cache_pred}表示。
+
+\begin{equation}
+    A_g = \exp(-\beta_g(1 - \textbf{e}_q^g \textbf{E}_{g}^\top)),\quad \hat{\textbf{L}}_{g} = \textrm{OH}(\hat{\textbf{L}}_{g}),\quad \hat{\textbf{y}}_g =  A_{g} \hat{\textbf{L}}_{g}
+    \label{eq:global_cache_pred}
+\end{equation}
+
+这里 $\textbf{e}_q^g \in \mathbb{R}^{1\times d}$ 表示样本$Q$的全局特征，$\textbf{E}_{g} \in \mathbb{R}^{CK\times d}$ 表示缓存的特征（键值），`OH' 是一种把 $\hat{\textbf{L}}_{g}$ 转换成 one-hot 编码的数据变换。$\textbf{e}_q^g \textbf{E}_{g}^\top \in \mathbb{R}^{1\times CK}$ 计算了查询与键值的余弦相似度；$\beta_g$ 是一个超参数，用来调整变换的锐度；指数运算确保权重矩阵 $A_g$ 中的值落在区间 (0,1]。$A_g$ 本质上包含了查询和缓存键值的相关关系，它作用到 $\hat{\textbf{L}}_{g}$ 用来生成全局缓存的自适应信号。
+
+\myEmph{（2）基于局部缓存的测试时自适应}
+
+尽管全局缓存生成的自适应信号对于模型适配测试数据有帮助，但是不够全面，因为全局缓存本身不包含点云数据的局部结构信息，这些信息对于测试数细微的结构变化很关键。为了实现更精准全面的自适应，本项目也利用局部缓存生成自适应信号。
+
+首先，对于新的测试样本 $Q$，提取它的局部结构特征 $\textbf{e}_q^{l}$，然后该特征被当作另一个查询从局部缓存检索相关知识。类似地，检索过程先计算一个权重矩阵 $A_{l}$，它表示 $\textbf{e}_q^{l}$ 和 $\hat{\textbf{E}}_{l}$ 的相似度，然后 $A_{l}$ 加权作用到局部缓存的标签数据 $\hat{\textbf{L}}_{l}$产生局部缓存的自适应信号 $\hat{\textbf{y}}_{l}$，如公式\ref{eq:local_cache_pred}所示。
+
+\begin{equation}
+    A_l = \exp(-\beta_l(1 - \textbf{e}_q^{l} \textbf{E}_{l}^\top)),\quad \hat{\textbf{L}}_{l} = \textrm{OH}(\hat{\textbf{L}}_{l}),\quad \hat{\textbf{y}}_{l} = \phi(A_{l} \hat{\textbf{L}}_{l})
+    \label{eq:local_cache_pred}
+\end{equation}
+
+$\textbf{e}_q^{l} \in \mathbb{R}^{m\times d}$, $\textbf{E}_{l} \in \mathbb{R}^{(m\cdot CK)\times d}$。函数 $\phi(\cdot)$ 是一个对样本$Q$的$m$个零部件特征的平均池化操作。$e_q^{l} \textbf{E}_{l}^\top \in \mathbb{R}^{m\times (m\cdot CK)}$ 计算了样本$Q$的局部特征和缓存局部特征的余弦相似度。类似地，$\beta_l$ 也是控制锐度的超参数。$A_{l} \hat{\textbf{L}}_{l} \in \mathbb{R}^{m\times C}$ 表示样本$Q$各局部结构的类别分布，由 $\phi(\cdot)$ 取均值后得到局部缓存的自适应信号。
+
+\myEmph{（2）在线点云数据整体测试时自适应}
+
+经过上述步骤建立的动态分层缓存模型，能够有效且全面捕获在线测试数据特点，并实时对模型初始预测 $\hat{\textbf{y}}_{zs}$ 进行自适应调整，产生最终的模型预测 $\hat{\textbf{y}}_g$，如公式\ref{eq:overall_pred}所示，其中$\alpha_{g}$ 和 $\alpha_{l}$是超参数。
+
+\begin{equation}
+    \hat{\textbf{y}} = \hat{\textbf{y}}_{zs} + \alpha_g \hat{\textbf{y}}_{g} + \alpha_l \hat{\textbf{y}}_{l}
+    \label{eq:overall_pred}
+\end{equation}
 
 \subsection{可行性分析}
 
