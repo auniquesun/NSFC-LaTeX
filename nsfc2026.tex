@@ -9,6 +9,8 @@
 
 
 \usepackage{nsfc}
+\usepackage{booktabs}
+\usepackage{multirow}
 \setmainfont{Times New Roman}
 
 %\usepackage{fontspec}
@@ -456,8 +458,66 @@ $\textbf{e}_q^{l} \in \mathbb{R}^{m\times d}$, $\textbf{E}_{l} \in \mathbb{R}^{(
 
 \subsection{可行性分析}
 
-既然国内外相关工作都没能解决你提出的重要问题，为什么你觉得自己有望解决该问题。
-论述的时候通常包括：独特的时机、与众不同的方案、雄厚的相关科研积累等。
+\myEmph{明确的研究方案}
+% 少点套路，把最直接的思路写出来
+% 分别讲立项依据、研究内容、技术路线的可行性
+
+本项目设定的题目和研究方案建立在申请人的前期工作和对领域文献广泛深入调研的基础上，是对前期工作的拓展和深化，具体分析如下：
+
+（1）申请人的前期工作围绕3D点云分析这一主题，着重提升点云分析方法的准确性、运行效率、鲁棒性和泛化性，其中有3篇已发表论文探讨开放环境下3D点云分析方法的参数/数据使用效率、泛化性和测试时自适应问题，另外2篇已发表论文研究了封闭数据集设定下点云理解模型的高效架构设计及准确性提升，因此具备了开展本项目的研究基础。
+
+（2）点云特征鲁棒编码的研究，已有众多技术流派，其中基于大规模点云-文本-图像三元组数据的对比预训练方法展示出了在开放场景下的识别和处理能力，表明学到的特征表示具有良好的语义泛化能力，这为本项目深入研究鲁棒的点云特征编码提供了有价值的参考。
+
+（3）缓存的思路已在图像处理、语言建模、点云分析领域得到研究和应用，特别是在训练样本受限的情况下，能够大幅改善这些任务的预测能力，这为基于缓存模型的点云处理测试时自适应研究提供了理论和技术支撑。
+
+\myEmph{扎实的研究基础}
+% 把那个表格放在这吧，表格做成PDF？还是直接写latex？直接写吧
+%   把表格信息写出来，表格包含什么信息？
+
+申请人第一作者在计算机视觉和人工智能领域顶级期刊和会议发表了系列研究成果，如表\ref{tab:research_foundation}所示，
+在本项目涉及的开放环境3D点云分析方法、高效的点云编码模型架构设计、点云处理模型泛化性和鲁棒性提升、测试时自适应技术等方面进行了扎实的科研积累。
+本人作为项目成员参与了国家自然科学基金项目《基于模块拼接的群智SLAM关键问题研究》和公安部重点实验室项目《高精点云地图构建与视觉定位导航方法研究》，为研究方案的设计、验证、执行贡献了力量。
+
+\begin{table}[ht]
+   \footnotesize
+   \centering
+   \caption{\textbf{与本项目相关的前期工作}}
+   \begin{tabular}{l c c c}
+      \toprule
+      发表情况 & 申请人排序 & 论文名称 & 工作特点\\
+      \midrule
+      \multirow{4}{*}{CVPR 2025} & \multirow{4}{*}{第一作者} & Point-Cache: Test-time Dynamic & 1. 3D点云分析 \\
+      & & and Hierarchical Cache for  & 2. 开放环境/3D大模型 \\
+      & & Robust and Generalizable & 3. 缓存模型/检索增强/即插即用 \\
+      & & Point Cloud Analysis & 4. 鲁棒性/泛化性 \\
+      \midrule
+      \multirow{4}{*}{NeurIPS 2024} & \multirow{4}{*}{第一作者} & Point-PRC: A Prompt Learning   & 1. 3D点云分析 \\
+      & & Based Regulation Framework   & 2. 开放环境/3D大模型 \\      
+      & & for Generalizable & 3. 约束框架/即插即用 \\
+      & & Point Cloud Analysis & 4. 准确性/泛化性 \\
+      \midrule
+      \multirow{4}{*}{TVCG 2025} & \multirow{4}{*}{第一作者} & VSFormer: Mining Correlations & 1. 3D形状分析 \\
+      & & in Flexible View Set & 2. 封闭环境 \\
+      & & for Multi-View & 3. 灵活高效的模型架构 \\
+      & & 3D Shape Understanding & 4. 准确性/运行效率 \\
+      \midrule
+      \multirow{4}{*}{ICRA 2024} & \multirow{4}{*}{第一作者} & Parameter-efficient    & 1. 3D点云分析 \\
+      & & Prompt Learning  & 2. 开放环境/3D大模型 \\
+      & & for 3D & 3. 轻量提示学习 \\
+      & & Point Cloud Understanding & 4. 参数效率/数据效率/准确性 \\
+      \midrule
+      \multirow{4}{*}{ICRA 2023} & \multirow{4}{*}{第一作者} & ViPFormer: Efficient  Transformer & 1. 3D点云理解 \\
+      & & Vision-and-Pointcloud  & 2. 封闭环境 \\
+      & & for Unsupervised & 3. 统一的模型架构 \\ % 统一的图像-点云模型架构+无监督预训练方法
+      & & Pointcloud Understanding & 4. 准确性/运行效率 \\
+      \bottomrule
+   \end{tabular}
+   \label{tab:research_foundation}
+\end{table}
+
+综上所述，申请人具备了承担本项目的研究基础，项目设计的研究方案和技术路线具有可行性，相信在国家自然科学基金委的资助下，能够攻克项目中的重点难点问题，取得预期成果。
+
+\myEmph{良好的研究条件}
 
 
 \NsfcSection{4}{本项目的特色与创新之处；}{}
