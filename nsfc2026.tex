@@ -11,6 +11,8 @@
 \usepackage{nsfc}
 \usepackage{booktabs}
 \usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{subcaption}
 \setmainfont{Times New Roman}
 
 %\usepackage{fontspec}
@@ -557,30 +559,112 @@ $\textbf{e}_q^{l} \in \mathbb{R}^{m\times d}$, $\textbf{E}_{l} \in \mathbb{R}^{(
 \NsfcSection{1}{研究基础}{
 （与本项目相关的研究工作积累和已取得的研究工作成绩）；}
 
-申请人自2017年开始从事基于深度学习的计算机视觉和三维视觉相关研究工作，具备扎实的理论基础和丰富的实践经验，取得了一些理论和应用创新成果。申请人的博士学位论文《多视图多模态三维物体理解关键技术研究》获评中国人民大学2025年度优秀博士学位论文，申请人于2023年获得国家留学基金委公派留学奖学金,后赴澳大利亚莫纳什大学（Monash University）数据科学与人工智能系进行为期一年的博士联合培养，联培期间的研究方向仍是三维视觉和点云处理，合作导师为蔡剑飞教授（Prof. Jianfei Cai），与蔡剑飞教授团队建立了良好而深入的合作关系。
+申请人自2017年开始从事基于深度学习的计算机视觉和三维视觉相关研究工作，具备扎实的理论基础和丰富的实践经验，取得了一些理论和应用创新成果。申请人的博士学位论文《多视图多模态三维物体理解关键技术研究》获评中国人民大学2025年度优秀博士学位论文，申请人于2023年获得国家留学基金委公派留学奖学金,后赴澳大利亚莫纳什大学（Monash University）数据科学与人工智能系进行为期一年的博士联合培养，联培期间的研究方向仍是三维视觉和点云处理，合作导师为蔡剑飞教授（Prof. Jianfei Cai），与蔡剑飞教授团队建立了良好而深入的合作关系。下文将从申请人的前期预研工作、参与的相关项目、获得的相关奖励三方面介绍研究基础：
 
-本人博士期间围绕3D点云处理的准确性、运行效率、鲁棒性和泛化性进行深入研究，广泛阅读了相关文献，熟悉主要技术路径和方法，提出系列创新方案并发表了系列高水平论文，在该领域具备扎实的研究基础。例如，本人以第一作者发表在 CVPR 2025 的论文提出《Point-Cache: Test-time Dynamic and Hierarchical Cache for Robust and Generalizable Point Cloud Analysis》提出了一个动态和分层缓存模型，大幅改善了3D点云处理模型在测试/部署阶段的鲁棒性和泛化能力；以第一作者发表在 NeurIPS 2024 的论文《Point-PRC: A Prompt Learning Based Regulation Framework for Generalizable Point Cloud Analysis》提出了一种基于提示学习的即插即用的监管框架，该框架能无缝集成到不同多模态3D大模型中，在增强点云处理下游任务性能的同时，改善多模态3D大模型在未知点云数据的泛化能力；以第一作者发表在 TVCG 2025 的论文《VSFormer: Mining Correlations in Flexible View Set for Multi-view 3D Shape Understanding》设计了一种灵活的3D物体多视图关系建模方法，增强了不同视图间的信息流动和交互，提升了3D物体建模和识别的准确性；以第一作者发表在 ICRA 2024 的论文《Parameter-efficient Prompt Learning for 3D Point Cloud Understanding》提出了一种参数和数据双重高效的提示学习方法，仅用极少训练参数和数据样本就能激活多模态3D大模型丰富的预训练知识，显著提升了模型在点云处理任务中的准确性和运行效率；以第一作者发表在 ICRA 2023 的论文《ViPFormer: Efficient Vision-and-Pointcloud Transformer for Unsupervised Pointcloud Understanding》提出了一种无监督预训练模型架构，该架构能有效融合图像和点云多模态数据信息，促进点云处理下游任务取得更好效果，同时提升下游任务的运行效率。
+\subsection{前期预研工作}
 
-以我本人的第一个国基金项目的\myEmph{申请原文为例}，通过高度精炼的语言，
-在2页左右的篇幅中快速讲清楚：1）大部分申请人没有的特色优势是什么；
-2）特色工作和拟研究工作的联系得清晰。
+申请人博士期间围绕3D点云处理的准确性、运行效率、鲁棒性和泛化性进行深入研究，广泛阅读了相关文献，熟悉主要技术路径和方法，提出了创新性解法并发表了系列高水平论文，在该领域具备扎实的研究基础，前期工作如表~\ref{tab:research_foundation}所示。
+具体来说，申请人以第一作者发表在 CVPR 2025 的论文提出《Point-Cache: Test-time Dynamic and Hierarchical Cache for Robust and Generalizable Point Cloud Analysis》提出了一个拔插即用的缓存模型，大幅改善了3D点云处理模型在测试/部署阶段的鲁棒性和泛化能力（\textbf{见附件1}）；以第一作者发表在 NeurIPS 2024 的论文《Point-PRC: A Prompt Learning Based Regulation Framework for Generalizable Point Cloud Analysis》提出了一种基于提示学习的即插即用的约束框架，该框架能无缝集成到不同多模态3D大模型中，在增强点云处理下游任务性能的同时，改善多模态3D大模型在未知点云数据的泛化能力（\textbf{见附件1}）；以第一作者发表在 TVCG 2025 的论文《VSFormer: Mining Correlations in Flexible View Set for Multi-view 3D Shape Understanding》设计了一种灵活的3D物体多视图关系建模方法，增强了不同视图间的信息流动和交互，提升了3D物体建模和识别的准确性（\textbf{见附件1}）；以第一作者发表在 ICRA 2024 的论文《Parameter-efficient Prompt Learning for 3D Point Cloud Understanding》提出了一种参数和数据双重高效的提示学习方法，仅用极少训练参数和数据样本就能激活多模态3D大模型丰富的预训练知识，显著提升了模型在点云处理任务中的准确性和运行效率（\textbf{见附件1}）；以第一作者发表在 ICRA 2023 的论文《ViPFormer: Efficient Vision-and-Pointcloud Transformer for Unsupervised Pointcloud Understanding》提出了一种无监督预训练模型架构，该架构能有效融合图像和点云多模态数据信息，促进点云处理下游任务取得更好效果，同时提升下游任务的运行效率（\textbf{见附件1}）。
 
-申请人在与本项目相关的研究工作中有着丰富的积累，并取得了国际领先的科研成果, 
-发表\myEmph{10余篇CCF A类}国际期刊及会议论文（ACM TOG 4篇，IEEE TPAMI 2篇，
-IEEE CVPR 3篇，IEEE ICCV 2篇，IEEE TVCG 2篇），
-\myEmph{论文Google Scholar他引1600+次，一作论文单篇最高他引700+次}。
-这些研究基础主要包括3个方面：
+\begin{table}[ht]
+   \footnotesize
+   \centering
+   \caption{\textbf{与本项目相关的前期工作}}
+   \begin{tabular}{l c c c}
+      \toprule
+      \textbf{发表情况} & \textbf{申请人排序} & \textbf{论文名称} & \textbf{与本项目联系}\\
+      \midrule
+      \multirow{4}{*}{CVPR 2025} & \multirow{4}{*}{第一作者} & Point-Cache: Test-time Dynamic & 1. 3D点云分析 \\
+      & & and Hierarchical Cache for  & 2. 开放环境/3D大模型 \\
+      & & Robust and Generalizable & 3. 缓存模型/检索增强/即插即用 \\
+      & & Point Cloud Analysis & 4. 鲁棒性/泛化性 \\
+      \midrule
+      \multirow{4}{*}{NeurIPS 2024} & \multirow{4}{*}{第一作者} & Point-PRC: A Prompt Learning   & 1. 3D点云分析 \\
+      & & Based Regulation Framework   & 2. 开放环境/3D大模型 \\      
+      & & for Generalizable & 3. 约束框架/即插即用 \\
+      & & Point Cloud Analysis & 4. 准确性/泛化性 \\
+      \midrule
+      \multirow{4}{*}{TVCG 2025} & \multirow{4}{*}{第一作者} & VSFormer: Mining Correlations & 1. 3D形状分析 \\
+      & & in Flexible View Set & 2. 封闭环境 \\
+      & & for Multi-View & 3. 灵活高效的模型架构 \\
+      & & 3D Shape Understanding & 4. 准确性/运行效率 \\
+      \midrule
+      \multirow{4}{*}{ICRA 2024} & \multirow{4}{*}{第一作者} & Parameter-efficient    & 1. 3D点云分析 \\
+      & & Prompt Learning  & 2. 开放环境/3D大模型 \\
+      & & for 3D & 3. 轻量提示学习 \\
+      & & Point Cloud Understanding & 4. 参数效率/数据效率/准确性 \\
+      \midrule
+      \multirow{4}{*}{ICRA 2023} & \multirow{4}{*}{第一作者} & ViPFormer: Efficient  Transformer & 1. 3D点云理解 \\
+      & & Vision-and-Pointcloud  & 2. 封闭环境 \\
+      & & for Unsupervised & 3. 统一的模型架构 \\ % 统一的图像-点云模型架构+无监督预训练方法
+      & & Pointcloud Understanding & 4. 准确性/运行效率 \\
+      \bottomrule
+   \end{tabular}
+   \label{tab:research_foundation}
+\end{table}
+
+\subsection{参与相关项目情况}
+
+申请人博士期间参与了和本课题相关的项目，比如《高精点云地图构建与视觉定位导航方法研究》、《基于模块拼接的群智SLAM关键问题研究》，在项目中负责文献调研和综述、点云地图构建方法设计等内容，如表\ref{tab:related_projects}所示。
+通过参与这些科研项目，申请人掌握了开放环境下点云处理和自适应分析的基础理论和技术手段，具备了项目规划和执行的实际经验，初步具备了独立开展本项目的能力，相信在国家自然科学基金委的资助下，能够解决项目中的难点问题和技术挑战，按计划推进各项研究内容，实现预期研究成果。
+
+\begin{table}[ht]
+   \centering
+   \caption{\textbf{申请人参与的相关项目}}
+   \scriptsize
+   \begin{tabular}{l c c}
+    \toprule
+      \textbf{项目来源} & \textbf{项目名称} & \textbf{申请人角色} \\
+      \midrule
+      \multirow{2}{*}{公安部重点实验室} & \multirow{2}{*}{《高精点云地图构建与视觉定位导航方法研究》} & 文献调研、研究现状综述 \\
+      & & 点云地图构建方法设计和实现 \\
+      \midrule
+      \multirow{2}{*}{国家自然科学基金委} & \multirow{2}{*}{《基于模块拼接的群智SLAM关键问题研究》} & 文献调研、研究现状综述 \\
+      & & SLAM地图构建方法设计和实现 \\
+    \bottomrule
+    \end{tabular}
+    \label{tab:related_projects}
+\end{table}
 
 \subsection{研究工作获奖}
 
-
-申请人在空间智能和3D点云处理方面的初步工作获得了多项重要奖励，
+申请人在空间智能和3D点云处理方面的科研工作获得了多项重要奖励，
 包括：Google Travel Grant，
+博士生国家奖学金，
 中国人民大学优秀博士论文，
 NeurIPS Scholar Award，
 中国人民大学优秀博士毕业生。
 这些初步研究中取得的成果为本项目取得进一步的创新性成果打下了坚实的基础。
 
+\begin{figure}[htbp]
+     \centering
+     % First Image
+     \begin{subfigure}[b]{0.32\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{national_scholarhsip.pdf}
+        %  \caption{Description of first image}
+         \label{fig:image1}
+     \end{subfigure}
+     \hfill % Adds spacing between images
+     % Second Image
+     \begin{subfigure}[b]{0.32\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{google_travel_grant.pdf}
+        %  \caption{Description of second image}
+         \label{fig:image2}
+     \end{subfigure}
+     \hfill % Adds spacing between images
+     % Third Image
+     \begin{subfigure}[b]{0.32\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{outstanding_doctoral_graduate.pdf}
+        %  \caption{Description of third image}
+         \label{fig:image3}
+     \end{subfigure}
+     
+     \caption{博士期间科研工作获奖}
+     \label{fig:three_graphs}
+\end{figure}
 
 \NsfcSection{2}{工作条件}{
 （包括已具备的实验条件，尚缺少的实验条件和拟解决的途径，
@@ -626,14 +710,14 @@ NeurIPS Scholar Award，
 批准号、项目名称、获资助金额、起止年月、与本项目的关系及负责
 的内容等）；}
 
-正在承担的项目
+无
 
 \NsfcSection{4}{完成国家自然科学基金项目情况}{
 （对申请人负责的前一个已资助期满的科学基金项目（项目名称及批准号）完成情况、后续研究进
 展及与本申请项目的关系加以详细说明。另附该项目的研究工作总结
 摘要（限500字）和相关成果详细目录）。}
 
-已完成的国家自然科学基金
+无
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \ContentDes{（三） 其他需要说明的情况}
@@ -645,6 +729,7 @@ NeurIPS Scholar Award，
 间的区别与联系；已收到自然科学基金委不予受理或不予资助决定的，
 无需列出）。}
 
+无
 
 \NsfcSection{2}{}{具有高级专业技术职务（职称）的申请人是否
 存在同年申请或者参与申请国家自然科学基金项目的单位不一致的情
@@ -652,16 +737,19 @@ NeurIPS Scholar Award，
 他项目的项目类型、项目名称、单位名称、上述人员在该项目中是申
 请人还是参与者，并说明单位不一致原因。}
 
-
+无
 
 \NsfcSection{3}{}{具有高级专业技术职务（职称）的申请人是否
 存在与正在承担的国家自然科学基金项目的单位不一致的情况；如存
 在上述情况，列明所涉及人员的姓名，正在承担项目的批准号、项目
 类型、项目名称、单位名称、起止年月，并说明单位不一致原因。}
 
+无
 
 \NsfcSection{4}{}{同年以不同专业技术职务（职称）申请或参与申请科学基金项
 目的情况（应详细说明原因）。}
+
+无
 
 \NsfcSection{5}{}{其他。}
 
