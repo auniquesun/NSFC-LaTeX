@@ -13,6 +13,7 @@
 \usepackage{multirow}
 \usepackage{graphicx}
 \usepackage{subcaption}
+\usepackage{amsmath}
 \setmainfont{Times New Roman}
 
 %\usepackage{fontspec}
@@ -406,11 +407,8 @@ Research on Test-time Adaptation for 3D Point Cloud Analysis in Open World
 本项目的情境设定：一个训练好的点云处理模型要在开放环境中测试和部署，模型的输入是源源不断的点云数据，即测试数据流，执行的是3D物体识别、物体检测、场景分割等点云分析任务，本项目的目标是增强点云处理模型在测试阶段的自适应能力，提升测试时准确性、鲁棒性、泛化能力。
 首先围绕开放环境下点云特征的高效提取与鲁棒表示、基于在线点云数据流的缓存模型高效构建和更新、基于缓存模型的点云处理测试时自适应机制三个关键科学问题展开理论分析；然后根据理论分析设计模型，并在公开点云数据集上开展测试，用测试结果迭代优化模型；最后根据项目整体目标，将设计的模型置于开放环境大规模点云数据测试，根据模型自适应结果优化和完善方法设计。
 
-\subsection{技术路线}
-
-\subsubsection{点云特征编码}
-如图\figref{fig:pipline}所示，建议在具体写技术路线之前，先厘清这个框架图。
-技术路线的框架图通常比研究内容更加饱满，可以更好的展示本项目的研究思路。
+\subsection{研究方案和技术路线}
+申请人拟采取的研究方案和技术路线如图\figref{fig:pipline}所示。
 
 % \begin{figure}[ht]
 % 	\centering
@@ -420,11 +418,69 @@ Research on Test-time Adaptation for 3D Point Cloud Analysis in Open World
 %     }\label{fig:pipline}
 % \end{figure}
 
-\myEmph{点云特征编码}
+\subsubsection{具有开放环境语义理解能力的点云特征编码方法}
+% 画一幅方法整体图表
+% 分为哪几步
+%   按步骤写出来
 
-\myEmph{点云标签生成}
+这部分的输入是开放环境下3D点云数据和对应的带有位姿信息的 RGB-D 图像序列。
 
-\subsubsection{分层缓存模型建立和更新}
+\myEmph{类别无感的3D物体掩码生成}
+
+对于输入的点云数据 $\boldsymbol{P}\in \mathbb{R}^{N\times 3}$，本项目调整 OneFormer3D~\cite{kolodiazhnyi2024oneformer3d} 的架构，丢弃类别和置信度分数输出项，生成类别无感$M$个的3D物体掩码
+$\boldsymbol{m}_{1}^{3D},\dots,\boldsymbol{m}_{M}^{3D}$。3D掩码$\boldsymbol{m}_i^{3D} = (m_{i1}^{3D},\dots,m_{iP}^{3D})$ 由二值掩码表示，$m_{i1}^{3D} \in \{0,1\}$ 表示第$j$个点是否属于第$i$个物体。
+
+% 讲 OneFormer3D 分割过程
+%   Minskov Net 提取点云特征后，还做了 superpoint 操作
+% 首先，对于输入点云 $P$，将它体素化成一系列立方体小网格，然后利用3D稀疏卷积提取点云特征，得到 $P'\in \mathbb{R}^{N\times C}$。
+
+% 然后，为降低模型复杂度并提高计算效率，进一步对提取的点云特征进行池化操作，生成 superpoint 特征 $S \in \mathbb{R}^{M\times C}$。
+% 这些 superpoint 特征被送入 Transformer 解码器生成3D物体掩码，该解码器
+% 的架构借鉴了 SPFormer~\cite{sun24spformer} 的设计，包含6个注意力层。
+
+
+\myEmph{3D物体掩码特征计算}
+
+首先，计算每个3D掩码对应物体实例的可见性，并挑选出可见性为 top-k 的视图。
+接下来，生成选中的视图中物体的2D掩码，这些2D掩码被用于多尺度图像裁剪，裁剪的区域经过CLIP后得到对应的图像特征，不同缩放尺度的同一裁剪区域生成的图像特征经过平均池化操作，得到对应区域的掩码特征。下文将详细讲解每个步骤：
+
+【视图选择】
+
+top-k 视图选择：视图选择策略基于可见性分数，$s_{ij}$ 表示掩码 $i$ 在视图 $j$ 的可见性分数。给定一个掩码候选区域 \textbf{m}$_i^{3D}$，对应视图中的第 $i$ 个实例，可见性分数 $s_{ij} \in [0, 1]$ 根据如下公式计算得到
+
+\begin{equation}
+    s_{ij} = \frac{vis(i,j)}{max_{j'}(vis(i,j'))}
+\end{equation}
+
+$vis(i,j)$表示第 $i$ 个3D掩码在视图 $j$ 的中可见的点数。假设每个掩码至少在一个视图中可见。首先，对于第 $i$ 个3D掩码中的每个点，要确定该点是否在视图 $j$ 的相机视野内。
+为此，使用视图 $j$ 对应的相机内参 (\textbf{I}) 和 外参 (\textbf{R|t})将3D点投影到图像平面，得到对应的二维齐次坐标 $\textbf{p}_{\text{2D}} = (u, v, w)^\text{T} = \textbf{I}\cdot(\textbf{R|t})\cdot \textbf{x}$，其中 $\textbf{x} = (x,y,z,1)^\text{T}$ 是用齐次坐标表示的一个点。当 $w \neq 0$ 且 $\frac{u}{w} \in [0, W-1], \frac{v}{w} \in [0, H-1]$时，认为坐标3D点 $\textbf{p}_{\text{2D}}$ 落在相机的视野范围内，$W$ 和 $H$表示视图的像素宽度和高度。
+
+但需要注意的是，在相机视野内的3D点未必就可见，因为它可能被场景中的其他物体遮挡。因此，需要再次检查这些视野内的点是否真正可见，这时需要比较3D点的几何计算的深度值 $w$ 和深度图中投影点的深度值 $d$(*****别忘了模型输入还有深度图*****)。本方法认为满足 $w - d > k_{threshold}$ 这个不等式的点视作被遮挡，$k_{threshold}$ 是一个超参数。
+
+如果第 $i$ 个3D掩码在视图$j$的中没被遮挡，$vis(i,j)$的值就增加一。当所有3D掩码在视图中的可见性计算完成时，本方法为每个3D掩码选取可见性分数排前 $k$ 的视图。
+
+【2D掩码多尺度裁剪】
+
+对于选定的top-k视图中，本部分的目标是得到3D掩码对应的最优2D视图区域裁剪。
+考虑收到离群点影响，3D掩码的投影点可能不准确，投影边界框带有很多噪声。
+为此，本部分使用 SAM~\cite{kirillov23sam} 生成对应的2D区域掩码及置信度分数，使用 SAM 过程中用到了 point prompts。
+
+【CLIP特征提取和掩码特征聚合】
+
+对于每个2D掩码区域，使用$L$种不同尺度的图像裁剪，因此共生成 $k\cdot L$ 个裁剪图像。这些图像输入到 CLIP 视觉编码器中得到对应的特征嵌入，对于每个2D掩码区域，将这些CLIP提取的不同尺度的图像特征进行平均池化，得到该2D掩码区域的最终特征 $\boldsymbol{e}$。
+
+\myEmph{开放词表的3D物体实例分割}
+% 这部分就和 CLIP 分类一样了
+
+对于开放世界的语义类别 $c_1, c_2, \dots, c_Q$ 对应的文本描述，同样用 CLIP 文本编码器抽取其文本特征 $\boldsymbol{t}_1, \boldsymbol{t}_2, \dots, \boldsymbol{t}_Q$。
+然后，计算每个2D掩码区域 $\boldsymbol{e}_i$ 与各个语义类别的特征余弦相似度，经过\emph{softmax}变换，得到该掩码区域的语义类别分布预测。
+
+\begin{equation}
+    \hat{\textbf{y}}_{zs} = \{\hat{y}_k|_{k=1}^Q\}, \quad \hat{y}_k = \frac{\exp(sim(\boldsymbol{e}_i, \boldsymbol{t}_k) / \tau)}{\sum_{j=1}^{C}\exp(sim(\boldsymbol{e}_i, \boldsymbol{t}_{j}) / \tau)}
+    \label{eq:zero_shot_pred}
+\end{equation}
+
+\subsubsection{基于动态分层缓存模型的在线点云特性分析方法}
 
 为了更全面刻画测试数据分布，本项目拟开发一种分层缓存模型来记录在线测试样本的特性。
 分层缓存模型包含一个全局缓存和一个局部缓存，前者存放点云样本整体信息，后者存放局部结构信息。这种由粗到细的结构能更好为测试数据进行特征画像，从而提供更精确鲁棒的特征表示。拟设计的分层模型可分如下步骤构建，参见算法~\ref{alg:hierar_cache_construction}。
@@ -445,7 +501,7 @@ Research on Test-time Adaptation for 3D Point Cloud Analysis in Open World
 
 构建与更新：局部缓存的样本选择机制遵循全局缓存的设计，即仅当测试样本的全局指纹被放入全局缓存时，它的局部指纹才能被放入局部缓存。因此，在局部指纹中不必重复存储对应样本的熵值$h$。当局部缓存存满时，$\textbf{E}_l \in \mathbb{R}^{(m\cdot C K)\times d}$，$\hat{L} \in \mathbb{R}^{CK \times 1}$。
 
-\subsubsection{基于缓存模型的测试时自适应}
+\subsubsection{基于检索增强机制的点云分析测试时自适应方法}
 
 构建的分层缓存模型相当于一个具有丰富点云知识的在线知识库，本项目计划用该知识库来在线校准点云处理模型的预测，有效解决测试时发生的分布偏移、数据噪声问题。测试时自适应过程分为如下两个阶段：
 
@@ -473,7 +529,7 @@ Research on Test-time Adaptation for 3D Point Cloud Analysis in Open World
 
 $\textbf{e}_q^{l} \in \mathbb{R}^{m\times d}$, $\textbf{E}_{l} \in \mathbb{R}^{(m\cdot CK)\times d}$。函数 $\phi(\cdot)$ 是一个对样本$Q$的$m$个零部件特征的平均池化操作。$e_q^{l} \textbf{E}_{l}^\top \in \mathbb{R}^{m\times (m\cdot CK)}$ 计算了样本$Q$的局部特征和缓存局部特征的余弦相似度。类似地，$\beta_l$ 也是控制锐度的超参数。$A_{l} \hat{\textbf{L}}_{l} \in \mathbb{R}^{m\times C}$ 表示样本$Q$各局部结构的类别分布，由 $\phi(\cdot)$ 取均值后得到局部缓存的自适应信号。
 
-\myEmph{（2）在线点云数据整体测试时自适应}
+\myEmph{（3）在线点云数据整体测试时自适应}
 
 经过上述步骤建立的动态分层缓存模型，能够有效且全面捕获在线测试数据特点，并实时对模型初始预测 $\hat{\textbf{y}}_{zs}$ 进行自适应调整，产生最终的模型预测 $\hat{\textbf{y}}_g$，如公式\ref{eq:overall_pred}所示，其中$\alpha_{g}$ 和 $\alpha_{l}$是超参数。
 
