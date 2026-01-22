@@ -326,7 +326,7 @@ Research on Test-time Adaptation for 3D Point Cloud Analysis in Open World
 
 
 {
-\bibliographystyle{nsfc.bst}
+\bibliographystyle{nsfc_new.bst}
 \bibliography{nsfc2026}
 }
 
@@ -427,7 +427,7 @@ Research on Test-time Adaptation for 3D Point Cloud Analysis in Open World
 \myEmph{类别无感的3D物体掩码生成}
 
 对于输入的点云数据 $\boldsymbol{P}\in \mathbb{R}^{N\times 3}$，本项目调整 OneFormer3D~\cite{kolodiazhnyi2024oneformer3d} 的架构，丢弃类别和置信度分数输出项，生成类别无感$M$个的3D物体掩码
-$\boldsymbol{m}_{1}^{3D},\dots,\boldsymbol{m}_{M}^{3D}$。3D掩码$\boldsymbol{m}_i^{3D} = (m_{i1}^{3D},\dots,m_{iP}^{3D})$ 由二值掩码表示，$m_{i1}^{3D} \in \{0,1\}$ 表示第$j$个点是否属于第$i$个物体。
+$\{\boldsymbol{m}_{1}^{3D},\dots,\boldsymbol{m}_{M}^{3D}\}$。3D掩码$\boldsymbol{m}_i^{3D} = (m_{i1}^{3D},\dots,m_{iP}^{3D})$ 由二值掩码表示，$m_{i1}^{3D} \in \{0,1\}$ 表示第$j$个点是否属于第$i$个物体。
 
 % 讲 OneFormer3D 分割过程
 %   Minskov Net 提取点云特征后，还做了 superpoint 操作
@@ -445,7 +445,7 @@ $\boldsymbol{m}_{1}^{3D},\dots,\boldsymbol{m}_{M}^{3D}$。3D掩码$\boldsymbol{m
 
 【视图选择】
 
-top-k 视图选择：视图选择策略基于可见性分数，$s_{ij}$ 表示掩码 $i$ 在视图 $j$ 的可见性分数。给定一个掩码候选区域 \textbf{m}$_i^{3D}$，对应视图中的第 $i$ 个实例，可见性分数 $s_{ij} \in [0, 1]$ 根据公式~\ref{eq:vis_score}计算得到
+top-k 视图选择：视图选择策略基于可见性分数，$s_{ij}$ 表示掩码 $i$ 在视图 $j$ 的可见性分数。给定一个掩码候选区域 $\boldsymbol{m}_i^{3D}$，对应视图中的第 $i$ 个实例，可见性分数 $s_{ij} \in [0, 1]$ 根据公式~\ref{eq:vis_score}计算得到
 
 \begin{equation}
     s_{ij} = \frac{vis(i,j)}{max_{j'}(vis(i,j'))}
@@ -467,21 +467,21 @@ $vis(i,j)$表示第 $i$ 个3D掩码在视图 $j$ 的中可见的点数。假设�
 
 【CLIP特征提取和掩码特征聚合】
 
-对于每个2D掩码区域，使用$L$种不同尺度的图像裁剪，因此共生成 $k\cdot L$ 个裁剪图像。这些图像输入到 CLIP 视觉编码器中得到对应的特征嵌入，对于每个2D掩码区域，将这些CLIP提取的不同尺度的图像特征进行平均池化，得到该2D掩码区域的最终特征 $\boldsymbol{e}$。
+对于每个2D掩码区域，使用$L$种不同尺度的图像裁剪，因此共生成 $k\cdot L$ 个裁剪图像。这些图像输入到 CLIP 视觉编码器中得到对应的特征嵌入，对于每个2D掩码区域，将这些CLIP提取的不同尺度的图像特征进行平均池化，得到该2D掩码区域的最终特征 $\textbf{e}$。
 
 \myEmph{开放词表的3D物体类别预测}
 % 这部分就和 CLIP 分类一样了
 
-对于开放世界的语义类别 $1, 2, \dots, C$ 对应的文本描述，同样用 CLIP 文本编码器抽取其文本特征 $\boldsymbol{t}_1, \boldsymbol{t}_2, \dots, \boldsymbol{t}_C$。
-然后，计算每个2D掩码区域 $\boldsymbol{e}_i$ ($i \in \{1,\dots,C\}$) 与各个语义类别的特征余弦相似度，经过公式~\ref{eq:zero_shot_pred}中的\emph{softmax}变换，得到该掩码区域的语义类别分布预测。
+对于开放世界的语义类别 $1, 2, \dots, C$ 对应的文本描述，同样用 CLIP 文本编码器抽取其文本特征 $\textbf{t}_1, \textbf{t}_2, \dots, \textbf{t}_C$。
+然后，计算每个2D掩码区域 $\textbf{e}_i$ (其中$i \in \{1,\dots,C\}$) 与各个语义类别的特征余弦相似度，经过公式~\ref{eq:zero_shot_pred}中的\emph{softMax}变换，得到该掩码区域的语义类别分布预测。
 
 \begin{equation}
-    \hat{\textbf{y}}_{zs} = \{\hat{y}_j|_{j=1}^C\}, \quad \hat{y}_j = \frac{\exp(sim(\boldsymbol{e}_i, \boldsymbol{t}_j) / \tau)}{\sum_{k=1}^{C}\exp(sim(\boldsymbol{e}_i, \boldsymbol{t}_{k}) / \tau)}
+    \hat{\textbf{y}}_{zs} = \{\hat{y}_j|_{j=1}^C\}, \quad \hat{y}_j = \frac{\exp(sim(\textbf{e}_i, \textbf{t}_j) / \tau)}{\sum_{k=1}^{C}\exp(sim(\textbf{e}_i, \textbf{t}_{k}) / \tau)}
     \label{eq:zero_shot_pred}
 \end{equation}
 
-这里 $\boldsymbol{t}_j$ 是第 个语义类别的文本特征，$sim(\cdot,\cdot)$ 计算了输入的余弦相似度，$\tau$ 是一个超参数。
-至此，模型对点云 $\boldsymbol{P}$ 的语义类别初始预测为 $\hat{L} = \argmax\{\hat{y}_j|_{j=1}^C\}$，即概率最高的那个类别。
+这里 $\textbf{t}_j$ 是第 个语义类别的文本特征，$sim(\cdot,\cdot)$ 计算了输入的余弦相似度，$\tau$ 是一个超参数。
+至此，模型对点云 $\boldsymbol{P}$ 的语义类别初始预测为 $\hat{L} = \argmax\limits_{j} \{\hat{y}_j|_{j=1}^C\}$，即概率最高的那个类别。
 
 \subsubsection{基于动态分层缓存模型的在线点云特性分析方法}
 % motivation 写得不够，为啥有了初始预测还要建缓存？
@@ -501,7 +501,7 @@ $vis(i,j)$表示第 $i$ 个3D掩码在视图 $j$ 的中可见的点数。假设�
 
 全局缓存用 $\textbf{C}_g = (\textbf{E}_g, \hat{\textbf{L}}_g, \textbf{h}_g)$ 三元组表示，分别对应点云数据的 (特征，标签，熵)。为了高效管理，拟设计一种选择机制将高质量测试样本优先放入缓存。
 
-构建：全局缓存按照样本类别存放物体，每个类别最多存放 $K$ 个物体。开始时，全局缓存为空，随着在线数据流的输入，为当前样本 $P$ 生成指纹三元组 ($\textbf{e}^g, \hat{L}, h$)并放置到类别$\hat{L}$中。
+构建：全局缓存按照样本类别存放物体，每个类别最多存放 $K$ 个物体。开始时，全局缓存为空，随着在线数据流的输入，为当前样本 $\boldsymbol{P}$ 生成指纹三元组 ($\textbf{e}^g, \hat{L}, h$)并放置到类别$\hat{L}$中。
 
 更新：随着测试样本逐渐增加，首先要检查类别$\hat{L}$中存放的样本数是否达到上限$K$，如果未达到，则继续将当前样本放入对应类别；否则，在类别$\hat{L}$中找到熵最大的样本，将其与当前样本$P$的熵值比较，如果当前样本的熵更小，则用当前样本替换类别$\hat{L}$中熵最大的样本，否则不对缓存更新，继续处理下一个测试样本。当全局缓存容量达到上限时，$\textbf{E}_g \in \mathbb{R}^{CK\times d}$，$\hat{L}_g \in \mathbb{R}^{CK \times 1}$，$\hat{h}_g \in \mathbb{R}^{CK \times 1}$。
 
@@ -509,7 +509,7 @@ $vis(i,j)$表示第 $i$ 个3D掩码在视图 $j$ 的中可见的点数。假设�
 
 尽管全局缓存包含了测试数据的整体分布信息，但缺乏对于点云局部结构的掌握，而这些局部结构信息对于物体识别、检测、语义分割等3D感知任务比较关键。本项目拟设计局部缓存模型以解决这种限制。
 
-局部缓存用 $\textbf{C}_l = (\textbf{E}_l, \hat{\textbf{L}}_l)$ 表示，存储点云数据的局部特征和标签信息。与此对应，单个测试样本$P$的局部指纹信息表示为 ($\textbf{e}^l, \hat{L}$)，$\textbf{e}^l \in \mathbb{R}^{m\times d}$。
+局部缓存用 $\textbf{C}_l = (\textbf{E}_l, \hat{\textbf{L}}_l)$ 表示，存储点云数据的局部特征和标签信息。与此对应，单个测试样本$\boldsymbol{P}$的局部指纹信息表示为 ($\textbf{e}^l, \hat{L}$)，$\textbf{e}^l \in \mathbb{R}^{m\times d}$。
 
 构建与更新：局部缓存的样本选择机制遵循全局缓存的设计，即仅当测试样本的全局指纹被放入全局缓存时，它的局部指纹才能被放入局部缓存。因此，在局部指纹中不必重复存储对应样本的熵值$h$。当局部缓存容量满时，$\textbf{E}_l \in \mathbb{R}^{(m\cdot C K)\times d}$，$\hat{L} \in \mathbb{R}^{CK \times 1}$。
 
@@ -520,21 +520,21 @@ $vis(i,j)$表示第 $i$ 个3D掩码在视图 $j$ 的中可见的点数。假设�
 
 \myEmph{（1）基于全局缓存的测试时自适应}
 
-对于新来的点云测试样本 $Q$，它被当作一个查询来从全局缓存检索相关知识。具体来说，检索过程先要计算一个权重矩阵 $A_g$，这个矩阵表示 $Q$ 和缓存特征 $\textbf{E}_g$ 的相似度。这让新的测试样本与全局缓存建立了联系，更意味着初步理解了当前测试样本所处的上下文。然后将$A_g$作用到全局缓存的标签数据$\hat{\textbf{L}}_{g}$生成全局缓存的自适应信号 $\hat{\textbf{y}}_g$。上述过程可以用公式\ref{eq:global_cache_pred}表示。
+对于新来的点云测试样本 $\boldsymbol{Q}$，它被当作一个查询来从全局缓存检索相关知识。具体来说，检索过程先要计算一个权重矩阵 $A_g$，这个矩阵表示 $Q$ 和缓存特征 $\textbf{E}_g$ 的相似度。这让新的测试样本与全局缓存建立了联系，更意味着初步理解了当前测试样本所处的上下文。然后将$A_g$作用到全局缓存的标签数据$\hat{\textbf{L}}_{g}$生成全局缓存的自适应信号 $\hat{\textbf{y}}_g$。上述过程可以用公式\ref{eq:global_cache_pred}表示。
 
 \begin{equation}
     A_g = \exp(-\beta_g(1 - \textbf{e}_q^g \textbf{E}_{g}^\top)),\quad \hat{\textbf{L}}_{g} = \textrm{OH}(\hat{\textbf{L}}_{g}),\quad \hat{\textbf{y}}_g =  A_{g} \hat{\textbf{L}}_{g}
     \label{eq:global_cache_pred}
 \end{equation}
 
-这里 $\textbf{e}_q^g \in \mathbb{R}^{1\times d}$ 表示样本$Q$的全局特征，$\textbf{E}_{g} \in \mathbb{R}^{CK\times d}$ 表示缓存的键特征，`OH' 是把 $\hat{\textbf{L}}_{g}$ 转换成 one-hot 编码的数据变换。$\textbf{e}_q^g \textbf{E}_{g}^\top \in \mathbb{R}^{1\times CK}$ 计算了查询与键值的余弦相似度；$\beta_g$ 是一个超参数，用来调整变换的锐度；指数运算确保权重矩阵 $A_g$ 中的值落在区间 (0,1]。$A_g$ 本质上包含了查询和缓存键值的关联关系，它作用到 $\hat{\textbf{L}}_{g}$ 用来生成全局缓存的自适应信号。
+这里 $\textbf{e}_q^g \in \mathbb{R}^{1\times d}$ 表示样本$\boldsymbol{Q}$的全局特征，$\textbf{E}_{g} \in \mathbb{R}^{CK\times d}$ 表示缓存的键特征，`OH' 是把 $\hat{\textbf{L}}_{g}$ 转换成 one-hot 编码的数据变换。$\textbf{e}_q^g \textbf{E}_{g}^\top \in \mathbb{R}^{1\times CK}$ 计算了查询与键值的余弦相似度；$\beta_g$ 是一个超参数，用来调整变换的锐度；指数运算确保权重矩阵 $A_g$ 中的值落在区间 (0,1]。$A_g$ 本质上包含了查询和缓存键值的关联关系，它作用到 $\hat{\textbf{L}}_{g}$ 用来生成全局缓存的自适应信号。
 
 \myEmph{（2）基于局部缓存的测试时自适应}
 
 尽管全局缓存生成的自适应信号对于模型适配测试数据有帮助，但是不够全面，因为全局缓存本身不包含点云数据的局部结构信息，这些信息区分测试数据细微的结构变化很关键。
 为了实现更精准的自适应，本项目也利用局部缓存生成自适应信号。
 
-首先，对于新的测试样本 $Q$，提取它的局部结构特征 $\textbf{e}_q^{l}$，然后该特征被当作另一个查询从局部缓存检索相关知识。类似地，检索过程先计算一个权重矩阵 $A_{l}$，它表示 $\textbf{e}_q^{l}$ 和 $\textbf{E}_{l}$ 的相似度，然后 $A_{l}$ 加权作用到局部缓存的标签数据 $\hat{\textbf{L}}_{l}$产生局部缓存的自适应信号 $\hat{\textbf{y}}_{l}$，如公式\ref{eq:local_cache_pred}所示。
+首先，对于新的测试样本 $\boldsymbol{Q}$，提取它的局部结构特征 $\textbf{e}_q^{l}$，然后该特征被当作另一个查询从局部缓存检索相关知识。类似地，检索过程先计算一个权重矩阵 $A_{l}$，它表示 $\textbf{e}_q^{l}$ 和 $\textbf{E}_{l}$ 的相似度，然后 $A_{l}$ 加权作用到局部缓存的标签数据 $\hat{\textbf{L}}_{l}$产生局部缓存的自适应信号 $\hat{\textbf{y}}_{l}$，如公式\ref{eq:local_cache_pred}所示。
 
 \begin{equation}
     A_l = \exp(-\beta_l(1 - \textbf{e}_q^{l} \textbf{E}_{l}^\top)),\quad \hat{\textbf{L}}_{l} = \textrm{OH}(\hat{\textbf{L}}_{l}),\quad \hat{\textbf{y}}_{l} = \phi(A_{l} \hat{\textbf{L}}_{l})
@@ -558,7 +558,7 @@ $\textbf{e}_q^{l} \in \mathbb{R}^{m\times d}$, $\textbf{E}_{l} \in \mathbb{R}^{(
 % 少点套路，把最直接的思路写出来
 % 分别讲立项依据、研究内容、技术路线的可行性
 
-本项目设定的题目和研究方案建立在申请人的前期工作和对领域文献广泛深入调研的基础上，是对前期工作的拓展和深化，具体分析如下：
+本项目设定的题目和研究方案建立在申请人前期工作和对领域文献广泛深入调研的基础上，是对前期工作的拓展和深化，具体分析如下：
 
 （1）申请人的前期工作围绕3D点云分析这一主题，着重提升点云分析方法的准确性、运行效率、鲁棒性和泛化性，其中有3篇已发表论文探讨开放环境下3D点云分析方法的参数/数据使用效率、泛化性和测试时自适应问题，另外2篇已发表论文研究了封闭数据集设定下点云理解模型的高效架构设计及准确性提升，因此具备了开展本项目的研究基础。
 
@@ -570,39 +570,39 @@ $\textbf{e}_q^{l} \in \mathbb{R}^{m\times d}$, $\textbf{E}_{l} \in \mathbb{R}^{(
 % 把那个表格放在这吧，表格做成PDF？还是直接写latex？直接写吧
 %   把表格信息写出来，表格包含什么信息？
 
-申请人第一作者在计算机视觉和人工智能领域顶级期刊和会议发表了系列研究成果，如表\ref{tab:research_foundation}所示，
+申请人以第一作者在计算机视觉和人工智能领域顶级期刊和会议发表了系列研究成果，如表\ref{tab:research_foundation}所示，
 在本项目涉及的开放环境3D点云分析方法、高效的点云编码模型架构设计、点云处理模型泛化性和鲁棒性提升、测试时自适应技术等方面进行了扎实的科研积累。
-本人作为项目成员参与了国家自然科学基金项目《基于模块拼接的群智SLAM关键问题研究》和公安部重点实验室项目《高精点云地图构建与视觉定位导航方法研究》，为研究方案的设计、验证、执行贡献了力量。
+本人作为项目成员参与了国家自然科学基金项目《基于模块拼接的群智SLAM关键问题研究》和公安部重点实验室项目《高精点云地图构建与视觉定位导航方法研究》，为研究方案的设计、代码实现贡献了力量。
 
 \begin{table}[ht]
    \footnotesize
    \centering
    \caption{\textbf{与本项目相关的前期工作}}
-   \begin{tabular}{l c c c}
+   \begin{tabular}{l c c l}
       \toprule
       发表情况 & 申请人排序 & 论文名称 & 工作特点\\
       \midrule
-      \multirow{4}{*}{CVPR 2025} & \multirow{4}{*}{第一作者} & Point-Cache: Test-time Dynamic & 1. 3D点云分析 \\
-      & & and Hierarchical Cache for  & 2. 开放环境/3D大模型 \\
-      & & Robust and Generalizable & 3. 缓存模型/检索增强/即插即用 \\
-      & & Point Cloud Analysis & 4. 鲁棒性/泛化性 \\
-      \midrule
-      \multirow{4}{*}{NeurIPS 2024} & \multirow{4}{*}{第一作者} & Point-PRC: A Prompt Learning   & 1. 3D点云分析 \\
+      \multirow{4}{*}{NeurIPS 2024} & \multirow{4}{*}{唯一第一作者} & Point-PRC: A Prompt Learning   & 1. 3D点云分析 \\
       & & Based Regulation Framework   & 2. 开放环境/3D大模型 \\      
       & & for Generalizable & 3. 约束框架/即插即用 \\
       & & Point Cloud Analysis & 4. 准确性/泛化性 \\
       \midrule
-      \multirow{4}{*}{TVCG 2025} & \multirow{4}{*}{第一作者} & VSFormer: Mining Correlations & 1. 3D形状分析 \\
+      \multirow{4}{*}{CVPR 2025} & \multirow{4}{*}{唯一第一作者} & Point-Cache: Test-time Dynamic & 1. 3D点云分析 \\
+      & & and Hierarchical Cache for  & 2. 开放环境/3D大模型 \\
+      & & Robust and Generalizable & 3. 缓存模型/检索增强/即插即用 \\
+      & & Point Cloud Analysis & 4. 鲁棒性/泛化性 \\
+      \midrule
+      \multirow{4}{*}{TVCG 2025} & \multirow{4}{*}{唯一第一作者} & VSFormer: Mining Correlations & 1. 3D形状分析 \\
       & & in Flexible View Set & 2. 封闭环境 \\
       & & for Multi-View & 3. 灵活高效的模型架构 \\
       & & 3D Shape Understanding & 4. 准确性/运行效率 \\
       \midrule
-      \multirow{4}{*}{ICRA 2024} & \multirow{4}{*}{第一作者} & Parameter-efficient    & 1. 3D点云分析 \\
+      \multirow{4}{*}{ICRA 2024} & \multirow{4}{*}{唯一第一作者} & Parameter-efficient    & 1. 3D点云分析 \\
       & & Prompt Learning  & 2. 开放环境/3D大模型 \\
       & & for 3D & 3. 轻量提示学习 \\
       & & Point Cloud Understanding & 4. 参数效率/数据效率/准确性 \\
       \midrule
-      \multirow{4}{*}{ICRA 2023} & \multirow{4}{*}{第一作者} & ViPFormer: Efficient  Transformer & 1. 3D点云理解 \\
+      \multirow{4}{*}{ICRA 2023} & \multirow{4}{*}{唯一第一作者} & ViPFormer: Efficient  Transformer & 1. 3D点云理解 \\
       & & Vision-and-Pointcloud  & 2. 封闭环境 \\
       & & for Unsupervised & 3. 统一的模型架构 \\ % 统一的图像-点云模型架构+无监督预训练方法
       & & Pointcloud Understanding & 4. 准确性/运行效率 \\
@@ -611,15 +611,15 @@ $\textbf{e}_q^{l} \in \mathbb{R}^{m\times d}$, $\textbf{E}_{l} \in \mathbb{R}^{(
    \label{tab:research_foundation}
 \end{table}
 
-综上所述，申请人具备了承担本项目的研究基础，项目设计的研究方案和技术路线具有可行性，相信在国家自然科学基金委的资助下，能够攻克项目中的重点难点问题，取得预期成果。
+综上所述，申请人具备了开展本项目的研究基础，研究方案清晰，技术路线可行，相信在国家自然科学基金委的资助下，能够攻克项目中的关键技术问题，取得预期研究成果。
 
 \NsfcSection{4}{本项目的特色与创新之处；}{}
 
-（1）提出了融合文本和图像信息的点云特征鲁棒编码方法，为点云特征注入了语义信息，有效解决了单模态点云数据概念封闭的限制，奠定了点云处理方法在开放环境下执行任务的基础。
+（1）针对现有方法缺乏开放环境下语义理解能力的问题，提出了2D视觉掩码指导的点云特征编码方法，为点云特征编码注入了丰富语义信息，赋予了点云处理模型理解开放环境中概念的能力，有效解决了点云单模态模型语义概念封闭的限制，奠定了点云处理方法在开放环境下感知和理解的基础。
 
-（2）提出了即插即用的动态分层缓存方法，该方法能够实时捕获在线测试数据分布特性，精细刻画点云数据的局部结构和全局特征，为测试时自适应分析方法的设计提供有力支撑；同时该方法是一个通用的组件，能够无缝集成到当前主流点云处理模型中，助力不同模型实现测试时准确性和泛化性提升。
+（2）针对现有方法未充分利用在线测试数据特性准确性和泛化能力不足的问题，提出了即插即用的动态分层缓存模型，该模型能够精细刻画点云数据的全局特征和局部结构，实时捕获测试样本并分析数据分布特性，为测试时自适应分析方法的设计提供根本遵循；同时该方法是一个通用的组件，无需特殊修改就能集成到当前主流点云处理模型中。
 
-（3）提出了多源信息融合的模型测试时输出校正机制，该机制充分考虑了模型的原始预测，结合了动态缓存方法根据在线测试数据特性作出的针对性调整，能够有效应对测试数据的变化和噪声，大幅改善点云处理方法在开放环境的准确性、泛化性、适应能力。
+（3）针对现有测试时自适应策略依赖大量训练数据且重训练延迟高的问题，提出了基于检索增强机制的测试时自适应方法，该方法建立在测试样本组成的动态分层缓存之上，不依赖任何训练数据，也不需要任何训练，通过构建的缓存知识库快速生成自适应信号，能够有效应对测试数据的变化和噪声，大幅改善点云处理方法在开放环境的运行效率、准确性和泛化性能。
 
 \NsfcSection{5}{年度研究计划及预期研究结果}{
 （包括拟组织的重要学术交流活动、国际合作与交流计划等）。}
