@@ -20,15 +20,14 @@
 %\usepackage{xcolor}
 %\defaultfontfeatures{Ligatures=TeX}
 
-
-
-
 \newcommand{\addImg}[2][1.0]{\includegraphics[width=#1\linewidth]{#2}}
 \newcommand{\cmm}[1]{\textcolor[rgb]{0,0.6,0}{CMM: #1}}
 \newcommand{\todo}[1]{{\textcolor{red}{\bf [#1]}}}
 \newcommand{\myPara}[1]{\paragraph{#1：}}
 \newcommand{\myEmph}[1]{\textbf{\textcolor[rgb]{0,0,0.25}{#1}}}
 \newcommand{\mySec}[1]{\vspace{0.15in} \noindent \myEmph{$\square$~#1}}
+
+\DeclareMathOperator*{\argmax}{arg\,max}  % define once in preamble
 
 \graphicspath{{figures/}}
 
@@ -446,14 +445,15 @@ $\boldsymbol{m}_{1}^{3D},\dots,\boldsymbol{m}_{M}^{3D}$。3D掩码$\boldsymbol{m
 
 【视图选择】
 
-top-k 视图选择：视图选择策略基于可见性分数，$s_{ij}$ 表示掩码 $i$ 在视图 $j$ 的可见性分数。给定一个掩码候选区域 \textbf{m}$_i^{3D}$，对应视图中的第 $i$ 个实例，可见性分数 $s_{ij} \in [0, 1]$ 根据如下公式计算得到
+top-k 视图选择：视图选择策略基于可见性分数，$s_{ij}$ 表示掩码 $i$ 在视图 $j$ 的可见性分数。给定一个掩码候选区域 \textbf{m}$_i^{3D}$，对应视图中的第 $i$ 个实例，可见性分数 $s_{ij} \in [0, 1]$ 根据公式~\ref{eq:vis_score}计算得到
 
 \begin{equation}
     s_{ij} = \frac{vis(i,j)}{max_{j'}(vis(i,j'))}
+    \label{eq:vis_score}
 \end{equation}
 
 $vis(i,j)$表示第 $i$ 个3D掩码在视图 $j$ 的中可见的点数。假设每个掩码至少在一个视图中可见。首先，对于第 $i$ 个3D掩码中的每个点，要确定该点是否在视图 $j$ 的相机视野内。
-为此，使用视图 $j$ 对应的相机内参 (\textbf{I}) 和 外参 (\textbf{R|t})将3D点投影到图像平面，得到对应的二维齐次坐标 $\textbf{p}_{\text{2D}} = (u, v, w)^\text{T} = \textbf{I}\cdot(\textbf{R|t})\cdot \textbf{x}$，其中 $\textbf{x} = (x,y,z,1)^\text{T}$ 是用齐次坐标表示的一个点。当 $w \neq 0$ 且 $\frac{u}{w} \in [0, W-1], \frac{v}{w} \in [0, H-1]$时，认为坐标3D点 $\textbf{p}_{\text{2D}}$ 落在相机的视野范围内，$W$ 和 $H$表示视图的像素宽度和高度。
+为此，使用视图 $j$ 对应的相机内参 (\textbf{I}) 和 外参 (\textbf{R|t})将3D点投影到图像平面，得到对应的二维齐次坐标 $\textbf{p}_{\text{2D}} = (u, v, w)^\top = \textbf{I}\cdot(\textbf{R|t})\cdot \textbf{x}$，其中 $\textbf{x} = (x,y,z,1)^\top$ 是用齐次坐标表示的一个点。当 $w \neq 0$ 且 $\frac{u}{w} \in [0, W-1], \frac{v}{w} \in [0, H-1]$时，认为坐标3D点 $\textbf{p}_{\text{2D}}$ 落在相机的视野范围内，$W$ 和 $H$表示视图的像素宽度和高度。
 
 但需要注意的是，在相机视野内的3D点未必就可见，因为它可能被场景中的其他物体遮挡。因此，需要再次检查这些视野内的点是否真正可见，这时需要比较3D点的几何计算的深度值 $w$ 和深度图中投影点的深度值 $d$(*****别忘了模型输入还有深度图*****)。本方法认为满足 $w - d > k_{threshold}$ 这个不等式的点视作被遮挡，$k_{threshold}$ 是一个超参数。
 
@@ -469,69 +469,83 @@ $vis(i,j)$表示第 $i$ 个3D掩码在视图 $j$ 的中可见的点数。假设�
 
 对于每个2D掩码区域，使用$L$种不同尺度的图像裁剪，因此共生成 $k\cdot L$ 个裁剪图像。这些图像输入到 CLIP 视觉编码器中得到对应的特征嵌入，对于每个2D掩码区域，将这些CLIP提取的不同尺度的图像特征进行平均池化，得到该2D掩码区域的最终特征 $\boldsymbol{e}$。
 
-\myEmph{开放词表的3D物体实例分割}
+\myEmph{开放词表的3D物体类别预测}
 % 这部分就和 CLIP 分类一样了
 
-对于开放世界的语义类别 $c_1, c_2, \dots, c_Q$ 对应的文本描述，同样用 CLIP 文本编码器抽取其文本特征 $\boldsymbol{t}_1, \boldsymbol{t}_2, \dots, \boldsymbol{t}_Q$。
-然后，计算每个2D掩码区域 $\boldsymbol{e}_i$ 与各个语义类别的特征余弦相似度，经过\emph{softmax}变换，得到该掩码区域的语义类别分布预测。
+对于开放世界的语义类别 $1, 2, \dots, C$ 对应的文本描述，同样用 CLIP 文本编码器抽取其文本特征 $\boldsymbol{t}_1, \boldsymbol{t}_2, \dots, \boldsymbol{t}_C$。
+然后，计算每个2D掩码区域 $\boldsymbol{e}_i$ ($i \in \{1,\dots,C\}$) 与各个语义类别的特征余弦相似度，经过公式~\ref{eq:zero_shot_pred}中的\emph{softmax}变换，得到该掩码区域的语义类别分布预测。
 
 \begin{equation}
-    \hat{\textbf{y}}_{zs} = \{\hat{y}_k|_{k=1}^Q\}, \quad \hat{y}_k = \frac{\exp(sim(\boldsymbol{e}_i, \boldsymbol{t}_k) / \tau)}{\sum_{j=1}^{C}\exp(sim(\boldsymbol{e}_i, \boldsymbol{t}_{j}) / \tau)}
+    \hat{\textbf{y}}_{zs} = \{\hat{y}_j|_{j=1}^C\}, \quad \hat{y}_j = \frac{\exp(sim(\boldsymbol{e}_i, \boldsymbol{t}_j) / \tau)}{\sum_{k=1}^{C}\exp(sim(\boldsymbol{e}_i, \boldsymbol{t}_{k}) / \tau)}
     \label{eq:zero_shot_pred}
 \end{equation}
 
-\subsubsection{基于动态分层缓存模型的在线点云特性分析方法}
+这里 $\boldsymbol{t}_j$ 是第 个语义类别的文本特征，$sim(\cdot,\cdot)$ 计算了输入的余弦相似度，$\tau$ 是一个超参数。
+至此，模型对点云 $\boldsymbol{P}$ 的语义类别初始预测为 $\hat{L} = \argmax\{\hat{y}_j|_{j=1}^C\}$，即概率最高的那个类别。
 
-为了更全面刻画测试数据分布，本项目拟开发一种分层缓存模型来记录在线测试样本的特性。
-分层缓存模型包含一个全局缓存和一个局部缓存，前者存放点云样本整体信息，后者存放局部结构信息。这种由粗到细的结构能更好为测试数据进行特征画像，从而提供更精确鲁棒的特征表示。拟设计的分层模型可分如下步骤构建，参见算法~\ref{alg:hierar_cache_construction}。
+\subsubsection{基于动态分层缓存模型的在线点云特性分析方法}
+% motivation 写得不够，为啥有了初始预测还要建缓存？
+
+为了更加全面准确刻画测试数据分布，本项目拟开发一种动态分层缓存模型来记录在线测试样本的特性。
+分层缓存模型包含一个全局缓存和一个局部缓存，前者存放点云整体特征 $\textbf{e}^g$，后者存放局部结构信息 $\textbf{e}^l$，确保既能完整刻画点云特点又不引入大量额外开销。
+在测试和推理阶段，分层缓存模型需要根据在线测试数据维护和更新缓存内容，因此也是动态的。
+这种由粗到细的结构能更好为测试数据进行特征画像，从而提供更精确鲁棒的特征表示。
+
+分层缓存存储的是在线测试样本的键值对，键代表3D物体掩码特征 $\boldsymbol{e}$，值就是模型对该掩码区域的语义类别初始预测 $\hat{L}$。
+除此之外，还要记录该3D物体掩码的对应的类别分布预测 $\hat{\textbf{y}}_{zs}$ 的熵值 $h = -\sum_{j=1}^{C} \hat{y}_j \log \hat{y}_j$，
+这一指标反映了模型对初始预测的置信度，对于辨别高质量的测试样本和初始预测具有重要参考价值。
+拟设计的分层缓存可分如下步骤构建：
+% 参见算法~\ref{alg:hierar_cache_construction}。
 
 \myEmph{（1）全局缓存模型构建和更新}
 
 全局缓存用 $\textbf{C}_g = (\textbf{E}_g, \hat{\textbf{L}}_g, \textbf{h}_g)$ 三元组表示，分别对应点云数据的 (特征，标签，熵)。为了高效管理，拟设计一种选择机制将高质量测试样本优先放入缓存。
 
-构建：全局缓存按照样本类别存放物体，每个类别最多存放 $K$ 个物体。开始时，全局缓存为空，随着在线数据流的输入，为当前样本 $P$ 生成指纹三元组 ($\textbf{e}_p^g, \hat{L}, h$)并放置到类别$\hat{L}$中。
+构建：全局缓存按照样本类别存放物体，每个类别最多存放 $K$ 个物体。开始时，全局缓存为空，随着在线数据流的输入，为当前样本 $P$ 生成指纹三元组 ($\textbf{e}^g, \hat{L}, h$)并放置到类别$\hat{L}$中。
 
 更新：随着测试样本逐渐增加，首先要检查类别$\hat{L}$中存放的样本数是否达到上限$K$，如果未达到，则继续将当前样本放入对应类别；否则，在类别$\hat{L}$中找到熵最大的样本，将其与当前样本$P$的熵值比较，如果当前样本的熵更小，则用当前样本替换类别$\hat{L}$中熵最大的样本，否则不对缓存更新，继续处理下一个测试样本。当全局缓存容量达到上限时，$\textbf{E}_g \in \mathbb{R}^{CK\times d}$，$\hat{L}_g \in \mathbb{R}^{CK \times 1}$，$\hat{h}_g \in \mathbb{R}^{CK \times 1}$。
 
 \myEmph{（2）局部缓存模型构建和更新}
 
-尽管全局缓存包含了测试数据的整体分布信息，但缺乏对于点云局部结构的掌握，而这些局部结构信息对于物体识别、语义分割等点云分析任务比较关键。本项目拟设计局部缓存模型以解决这种限制。
+尽管全局缓存包含了测试数据的整体分布信息，但缺乏对于点云局部结构的掌握，而这些局部结构信息对于物体识别、检测、语义分割等3D感知任务比较关键。本项目拟设计局部缓存模型以解决这种限制。
 
-局部缓存用 $\textbf{C}_l = (\textbf{E}_l, \hat{\textbf{L}}_l)$ 表示，存储点云数据的局部特征和标签信息。与此对应，当个测试样本$P$的局部指纹信息表示为 ($\textbf{e}_p^l, \hat{L}$)，$\textbf{e}_p^l \in \mathbb{R}^{m\times d}$。
+局部缓存用 $\textbf{C}_l = (\textbf{E}_l, \hat{\textbf{L}}_l)$ 表示，存储点云数据的局部特征和标签信息。与此对应，单个测试样本$P$的局部指纹信息表示为 ($\textbf{e}^l, \hat{L}$)，$\textbf{e}^l \in \mathbb{R}^{m\times d}$。
 
-构建与更新：局部缓存的样本选择机制遵循全局缓存的设计，即仅当测试样本的全局指纹被放入全局缓存时，它的局部指纹才能被放入局部缓存。因此，在局部指纹中不必重复存储对应样本的熵值$h$。当局部缓存存满时，$\textbf{E}_l \in \mathbb{R}^{(m\cdot C K)\times d}$，$\hat{L} \in \mathbb{R}^{CK \times 1}$。
+构建与更新：局部缓存的样本选择机制遵循全局缓存的设计，即仅当测试样本的全局指纹被放入全局缓存时，它的局部指纹才能被放入局部缓存。因此，在局部指纹中不必重复存储对应样本的熵值$h$。当局部缓存容量满时，$\textbf{E}_l \in \mathbb{R}^{(m\cdot C K)\times d}$，$\hat{L} \in \mathbb{R}^{CK \times 1}$。
 
 \subsubsection{基于检索增强机制的点云分析测试时自适应方法}
 
-构建的分层缓存模型相当于一个具有丰富点云知识的在线知识库，本项目计划用该知识库来在线校准点云处理模型的预测，有效解决测试时发生的分布偏移、数据噪声问题。测试时自适应过程分为如下两个阶段：
+构建的动态分层缓存相当于一个刻画在线测试数据分布特点的丰富点云知识库，
+本项目计划用该知识库来实时校准点云处理模型的初始预测，有效解决测试时发生的分布偏移、数据噪声甚至坍塌问题。测试时自适应过程分为如下两个阶段：
 
 \myEmph{（1）基于全局缓存的测试时自适应}
 
-对于新来的测试样本 $Q$，它被当作一个查询来从全局缓存检索相关知识。具体来说，检索过程先要计算一个权重矩阵 $A_g$，这个矩阵表示 $Q$ 和缓存特征 $\textbf{E}_g$ 的相似度。这让新的测试样本与全局缓存数据建立了联系，更意味着初步理解了线测试数据的上下文。然后利用$A_g$对缓存的测试数据标签信息$\hat{L}_g$生成全局缓存的自适应信号 $\hat{\textbf{y}}_g$。上述过程可以用公式\ref{eq:global_cache_pred}表示。
+对于新来的点云测试样本 $Q$，它被当作一个查询来从全局缓存检索相关知识。具体来说，检索过程先要计算一个权重矩阵 $A_g$，这个矩阵表示 $Q$ 和缓存特征 $\textbf{E}_g$ 的相似度。这让新的测试样本与全局缓存建立了联系，更意味着初步理解了当前测试样本所处的上下文。然后将$A_g$作用到全局缓存的标签数据$\hat{\textbf{L}}_{g}$生成全局缓存的自适应信号 $\hat{\textbf{y}}_g$。上述过程可以用公式\ref{eq:global_cache_pred}表示。
 
 \begin{equation}
     A_g = \exp(-\beta_g(1 - \textbf{e}_q^g \textbf{E}_{g}^\top)),\quad \hat{\textbf{L}}_{g} = \textrm{OH}(\hat{\textbf{L}}_{g}),\quad \hat{\textbf{y}}_g =  A_{g} \hat{\textbf{L}}_{g}
     \label{eq:global_cache_pred}
 \end{equation}
 
-这里 $\textbf{e}_q^g \in \mathbb{R}^{1\times d}$ 表示样本$Q$的全局特征，$\textbf{E}_{g} \in \mathbb{R}^{CK\times d}$ 表示缓存的特征（键值），`OH' 是一种把 $\hat{\textbf{L}}_{g}$ 转换成 one-hot 编码的数据变换。$\textbf{e}_q^g \textbf{E}_{g}^\top \in \mathbb{R}^{1\times CK}$ 计算了查询与键值的余弦相似度；$\beta_g$ 是一个超参数，用来调整变换的锐度；指数运算确保权重矩阵 $A_g$ 中的值落在区间 (0,1]。$A_g$ 本质上包含了查询和缓存键值的相关关系，它作用到 $\hat{\textbf{L}}_{g}$ 用来生成全局缓存的自适应信号。
+这里 $\textbf{e}_q^g \in \mathbb{R}^{1\times d}$ 表示样本$Q$的全局特征，$\textbf{E}_{g} \in \mathbb{R}^{CK\times d}$ 表示缓存的键特征，`OH' 是把 $\hat{\textbf{L}}_{g}$ 转换成 one-hot 编码的数据变换。$\textbf{e}_q^g \textbf{E}_{g}^\top \in \mathbb{R}^{1\times CK}$ 计算了查询与键值的余弦相似度；$\beta_g$ 是一个超参数，用来调整变换的锐度；指数运算确保权重矩阵 $A_g$ 中的值落在区间 (0,1]。$A_g$ 本质上包含了查询和缓存键值的关联关系，它作用到 $\hat{\textbf{L}}_{g}$ 用来生成全局缓存的自适应信号。
 
 \myEmph{（2）基于局部缓存的测试时自适应}
 
-尽管全局缓存生成的自适应信号对于模型适配测试数据有帮助，但是不够全面，因为全局缓存本身不包含点云数据的局部结构信息，这些信息对于测试数细微的结构变化很关键。为了实现更精准全面的自适应，本项目也利用局部缓存生成自适应信号。
+尽管全局缓存生成的自适应信号对于模型适配测试数据有帮助，但是不够全面，因为全局缓存本身不包含点云数据的局部结构信息，这些信息区分测试数据细微的结构变化很关键。
+为了实现更精准的自适应，本项目也利用局部缓存生成自适应信号。
 
-首先，对于新的测试样本 $Q$，提取它的局部结构特征 $\textbf{e}_q^{l}$，然后该特征被当作另一个查询从局部缓存检索相关知识。类似地，检索过程先计算一个权重矩阵 $A_{l}$，它表示 $\textbf{e}_q^{l}$ 和 $\hat{\textbf{E}}_{l}$ 的相似度，然后 $A_{l}$ 加权作用到局部缓存的标签数据 $\hat{\textbf{L}}_{l}$产生局部缓存的自适应信号 $\hat{\textbf{y}}_{l}$，如公式\ref{eq:local_cache_pred}所示。
+首先，对于新的测试样本 $Q$，提取它的局部结构特征 $\textbf{e}_q^{l}$，然后该特征被当作另一个查询从局部缓存检索相关知识。类似地，检索过程先计算一个权重矩阵 $A_{l}$，它表示 $\textbf{e}_q^{l}$ 和 $\textbf{E}_{l}$ 的相似度，然后 $A_{l}$ 加权作用到局部缓存的标签数据 $\hat{\textbf{L}}_{l}$产生局部缓存的自适应信号 $\hat{\textbf{y}}_{l}$，如公式\ref{eq:local_cache_pred}所示。
 
 \begin{equation}
     A_l = \exp(-\beta_l(1 - \textbf{e}_q^{l} \textbf{E}_{l}^\top)),\quad \hat{\textbf{L}}_{l} = \textrm{OH}(\hat{\textbf{L}}_{l}),\quad \hat{\textbf{y}}_{l} = \phi(A_{l} \hat{\textbf{L}}_{l})
     \label{eq:local_cache_pred}
 \end{equation}
 
-$\textbf{e}_q^{l} \in \mathbb{R}^{m\times d}$, $\textbf{E}_{l} \in \mathbb{R}^{(m\cdot CK)\times d}$。函数 $\phi(\cdot)$ 是一个对样本$Q$的$m$个零部件特征的平均池化操作。$e_q^{l} \textbf{E}_{l}^\top \in \mathbb{R}^{m\times (m\cdot CK)}$ 计算了样本$Q$的局部特征和缓存局部特征的余弦相似度。类似地，$\beta_l$ 也是控制锐度的超参数。$A_{l} \hat{\textbf{L}}_{l} \in \mathbb{R}^{m\times C}$ 表示样本$Q$各局部结构的类别分布，由 $\phi(\cdot)$ 取均值后得到局部缓存的自适应信号。
+$\textbf{e}_q^{l} \in \mathbb{R}^{m\times d}$, $\textbf{E}_{l} \in \mathbb{R}^{(m\cdot CK)\times d}$。函数 $\phi(\cdot)$ 是一个对样本$Q$的$m$个局部特征的平均池化操作。$e_q^{l} \textbf{E}_{l}^\top \in \mathbb{R}^{m\times (m\cdot CK)}$ 计算了样本$Q$的局部特征和缓存局部特征的余弦相似度。类似地，$\beta_l$ 也是控制锐度的超参数。$A_{l} \hat{\textbf{L}}_{l} \in \mathbb{R}^{m\times C}$ 表示样本$Q$各局部结构的类别分布，由 $\phi(\cdot)$ 取均值后得到局部缓存的自适应信号。
 
 \myEmph{（3）在线点云数据整体测试时自适应}
 
-经过上述步骤建立的动态分层缓存模型，能够有效且全面捕获在线测试数据特点，并实时对模型初始预测 $\hat{\textbf{y}}_{zs}$ 进行自适应调整，产生最终的模型预测 $\hat{\textbf{y}}_g$，如公式\ref{eq:overall_pred}所示，其中$\alpha_{g}$ 和 $\alpha_{l}$是超参数。
+经过上述步骤生成的全局和局部自适应信号，充分捕捉了在线点云数据的特征并利用了数据分布特点，并对模型初始预测 $\hat{\textbf{y}}_{zs}$ 进行实时调整，产生最终的模型预测 $\hat{\textbf{y}}_g$，如公式\ref{eq:overall_pred}所示，其中$\alpha_{g}$ 和 $\alpha_{l}$是超参数。
 
 \begin{equation}
     \hat{\textbf{y}} = \hat{\textbf{y}}_{zs} + \alpha_g \hat{\textbf{y}}_{g} + \alpha_l \hat{\textbf{y}}_{l}
