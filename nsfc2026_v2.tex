@@ -626,7 +626,15 @@ $\textbf{e}_q^{l} \in \mathbb{R}^{m\times d}$, $\textbf{E}_{l} \in \mathbb{R}^{(
 
 \subsection{年度研究计划}
 
-本项目的年度研究计划总结在图~\ref{fig:image1}中，下面将介绍每年的研究计划和预期成果。
+本项目的年度研究计划总结在图~\ref{fig:progress_plan}中，下面将介绍每年的研究计划和预期成果。
+
+\begin{figure}[h]
+	\centering
+    \begin{overpic}[width=0.96\textwidth]{figures/progress_plan.pdf}
+    \end{overpic}
+    \caption{本项目年度研究计划。}
+    \label{fig:progress_plan}
+\end{figure}
 
 2027年1月-2027年12月：（1）研究类别无感的3D点云物体掩码生成方法和掩码特征建模方法，用视觉-文本信息指导3D点云感知任务，为模型注入现实世界语义信息；（2）设计实验验证3D物体掩码生成方法和掩码特征建模方法在开放词表3D点云感知任务中的准确性和效率，根据实验结果迭代方法设计；（3）将研究内容和技术创新撰写成论文，发表1-2篇高水平论文。
 
@@ -656,44 +664,45 @@ $\textbf{e}_q^{l} \in \mathbb{R}^{m\times d}$, $\textbf{E}_{l} \in \mathbb{R}^{(
 \NsfcSection{1}{研究基础}{
 （与本项目相关的研究工作积累和已取得的研究工作成绩）；}
 
-申请人自2017年开始从事基于深度学习的计算机视觉和三维视觉相关研究工作，具备扎实的理论基础和丰富的实践经验，取得了一些理论和应用创新成果。申请人的博士学位论文《多视图多模态三维物体理解关键技术研究》获评中国人民大学2025年度优秀博士学位论文，申请人于2023年获得国家留学基金委公派留学奖学金,后赴澳大利亚莫纳什大学（Monash University）数据科学与人工智能系进行为期一年的博士联合培养，联培期间的研究方向仍是三维视觉和点云处理，合作导师为蔡剑飞教授（Prof. Jianfei Cai），与蔡剑飞教授团队建立了良好而深入的合作关系。下文将从申请人的前期预研工作、参与的相关项目、获得的相关奖励三方面介绍研究基础：
+申请人自2017年开始从事基于深度学习的计算机视觉和三维视觉相关研究工作，具备扎实的理论基础和丰富的实践经验，在基于深度学习的点云理解方法研究中取得了系列创新成果。申请人的博士学位论文《多视图多模态三维物体理解关键技术研究》获评中国人民大学2025年度优秀博士学位论文，申请人于2023年获得国家留学基金委公派留学奖学金，2024年赴澳大利亚莫纳什大学（Monash University）数据科学与人工智能系进行为期一年的博士联合培养，联培期间的研究方向仍是三维视觉和点云处理，导师为蔡剑飞教授（Prof. Jianfei Cai），联培期间与蔡剑飞教授团队建立了良好而深入的合作关系。下文将从申请人的前期预研工作、参与的相关项目、获得的相关奖励三方面介绍研究基础：
 
-\subsection{前期预研工作}
+\subsection{前期预研工作情况}
 
-申请人博士期间围绕3D点云处理的准确性、运行效率、鲁棒性和泛化性进行深入研究，广泛阅读了相关文献，熟悉主要技术路径和方法，提出了创新性解法并发表了系列高水平论文，在该领域具备扎实的研究基础，前期工作如表~\ref{tab:research_foundation}所示。
-具体来说，申请人以第一作者发表在 CVPR 2025 的论文提出《Point-Cache: Test-time Dynamic and Hierarchical Cache for Robust and Generalizable Point Cloud Analysis》提出了一个拔插即用的缓存模型，大幅改善了3D点云处理模型在测试/部署阶段的鲁棒性和泛化能力（\textbf{见附件1}）；以第一作者发表在 NeurIPS 2024 的论文《Point-PRC: A Prompt Learning Based Regulation Framework for Generalizable Point Cloud Analysis》提出了一种基于提示学习的即插即用的约束框架，该框架能无缝集成到不同多模态3D大模型中，在增强点云处理下游任务性能的同时，改善多模态3D大模型在未知点云数据的泛化能力（\textbf{见附件1}）；以第一作者发表在 TVCG 2025 的论文《VSFormer: Mining Correlations in Flexible View Set for Multi-view 3D Shape Understanding》设计了一种灵活的3D物体多视图关系建模方法，增强了不同视图间的信息流动和交互，提升了3D物体建模和识别的准确性（\textbf{见附件1}）；以第一作者发表在 ICRA 2024 的论文《Parameter-efficient Prompt Learning for 3D Point Cloud Understanding》提出了一种参数和数据双重高效的提示学习方法，仅用极少训练参数和数据样本就能激活多模态3D大模型丰富的预训练知识，显著提升了模型在点云处理任务中的准确性和运行效率（\textbf{见附件1}）；以第一作者发表在 ICRA 2023 的论文《ViPFormer: Efficient Vision-and-Pointcloud Transformer for Unsupervised Pointcloud Understanding》提出了一种无监督预训练模型架构，该架构能有效融合图像和点云多模态数据信息，促进点云处理下游任务取得更好效果，同时提升下游任务的运行效率（\textbf{见附件1}）。
+申请人博士期间围绕3D点云处理的准确性、运行效率、鲁棒性和泛化性进行深入研究，广泛阅读了相关文献，熟悉主要技术路径和方法，提出了创新性方案并发表了系列高水平论文，在该领域具备扎实的研究基础，前期工作如表~\ref{tab:research_foundation}所示。
+具体来说，申请人以第一作者发表在 CVPR 2025 的论文提出《Point-Cache: Test-time Dynamic and Hierarchical Cache for Robust and Generalizable Point Cloud Analysis》提出了一个拔插即用的缓存模型，大幅改善了3D点云处理模型在测试/部署阶段的鲁棒性和泛化能力（\textbf{见附件1}）；申请人以第一作者发表在 NeurIPS 2024 的论文《Point-PRC: A Prompt Learning Based Regulation Framework for Generalizable Point Cloud Analysis》提出了一种基于提示学习的通用约束框架，该框架能无缝集成到主流多模态3D大模型中，在增强点云处理下游任务性能的同时，改善多模态3D大模型在未知点云数据的泛化能力（\textbf{见附件1}）；申请人以第一作者发表在 TVCG 2025 的论文《VSFormer: Mining Correlations in Flexible View Set for Multi-view 3D Shape Understanding》设计了一种灵活的数据结构组织3D物体不同视图，基于该结构提出了多视图关系建模方法，显著增强了不同视图间的信息流动和交互，提升了3D物体建模和识别的准确性（\textbf{见附件1}）；申请人以第一作者发表在 ICRA 2024 的论文《Parameter-efficient Prompt Learning for 3D Point Cloud Understanding》提出了一种参数和数据双重高效的提示学习方法，仅用极少训练参数和数据样本就能激活多模态3D大模型丰富的预训练知识，显著提升了模型在点云处理任务中的准确性和运行效率（\textbf{见附件1}）；申请人以第一作者发表在 ICRA 2023 的论文《ViPFormer: Efficient Vision-and-Pointcloud Transformer for Unsupervised Pointcloud Understanding》提出了一种无监督预训练模型架构，该架构能有效融合图像和点云多模态数据信息，促进点云处理下游任务取得更好准确性，同时提升下游任务的运行效率（\textbf{见附件1}）。
+相信这些前期工作积累的经验和技能为本项目的实施提供了坚实的研究基础。
 
 \begin{table}[ht]
    \footnotesize
    \centering
    \caption{\textbf{与本项目相关的前期工作}}
-   \begin{tabular}{l c c c}
+   \begin{tabular}{l c c l}
       \toprule
       \textbf{发表情况} & \textbf{申请人排序} & \textbf{论文名称} & \textbf{与本项目联系}\\
       \midrule
-      \multirow{4}{*}{CVPR 2025} & \multirow{4}{*}{第一作者} & Point-Cache: Test-time Dynamic & 1. 3D点云分析 \\
+      \multirow{4}{*}{CVPR 2025} & \multirow{4}{*}{唯一第一作者} & Point-Cache: Test-time Dynamic & 1. 3D点云分析 \\
       & & and Hierarchical Cache for  & 2. 开放环境/3D大模型 \\
-      & & Robust and Generalizable & 3. 缓存模型/检索增强/即插即用 \\
-      & & Point Cloud Analysis & 4. 鲁棒性/泛化性 \\
+      & & Robust and Generalizable & 3. 缓存模型/即插即用 \\
+      & & Point Cloud Analysis & 4. 准确性/鲁棒性/泛化性 \\
       \midrule
-      \multirow{4}{*}{NeurIPS 2024} & \multirow{4}{*}{第一作者} & Point-PRC: A Prompt Learning   & 1. 3D点云分析 \\
+      \multirow{4}{*}{NeurIPS 2024} & \multirow{4}{*}{唯一第一作者} & Point-PRC: A Prompt Learning   & 1. 3D点云分析 \\
       & & Based Regulation Framework   & 2. 开放环境/3D大模型 \\      
       & & for Generalizable & 3. 约束框架/即插即用 \\
       & & Point Cloud Analysis & 4. 准确性/泛化性 \\
       \midrule
-      \multirow{4}{*}{TVCG 2025} & \multirow{4}{*}{第一作者} & VSFormer: Mining Correlations & 1. 3D形状分析 \\
-      & & in Flexible View Set & 2. 封闭环境 \\
+      \multirow{4}{*}{TVCG 2025} & \multirow{4}{*}{唯一第一作者} & VSFormer: Mining Correlations & 1. 3D形状分析 \\
+      & & in Flexible View Set & 2. 封闭数据集 \\
       & & for Multi-View & 3. 灵活高效的模型架构 \\
       & & 3D Shape Understanding & 4. 准确性/运行效率 \\
       \midrule
-      \multirow{4}{*}{ICRA 2024} & \multirow{4}{*}{第一作者} & Parameter-efficient    & 1. 3D点云分析 \\
+      \multirow{4}{*}{ICRA 2024} & \multirow{4}{*}{唯一第一作者} & Parameter-efficient    & 1. 3D点云理解 \\
       & & Prompt Learning  & 2. 开放环境/3D大模型 \\
       & & for 3D & 3. 轻量提示学习 \\
       & & Point Cloud Understanding & 4. 参数效率/数据效率/准确性 \\
       \midrule
-      \multirow{4}{*}{ICRA 2023} & \multirow{4}{*}{第一作者} & ViPFormer: Efficient  Transformer & 1. 3D点云理解 \\
-      & & Vision-and-Pointcloud  & 2. 封闭环境 \\
-      & & for Unsupervised & 3. 统一的模型架构 \\ % 统一的图像-点云模型架构+无监督预训练方法
+      \multirow{4}{*}{ICRA 2023} & \multirow{4}{*}{唯一第一作者} & ViPFormer: Efficient Vision-and & 1. 3D点云理解 \\
+      & & -Pointcloud Transformer  & 2. 封闭数据集 \\
+      & & for Unsupervised & 3. 图像-点云无监督模型架构 \\ % 统一的图像-点云模型架构+无监督预训练方法
       & & Pointcloud Understanding & 4. 准确性/运行效率 \\
       \bottomrule
    \end{tabular}
@@ -702,36 +711,38 @@ $\textbf{e}_q^{l} \in \mathbb{R}^{m\times d}$, $\textbf{E}_{l} \in \mathbb{R}^{(
 
 \subsection{参与相关项目情况}
 
-申请人博士期间参与了和本课题相关的项目，比如《高精点云地图构建与视觉定位导航方法研究》、《基于模块拼接的群智SLAM关键问题研究》，在项目中负责文献调研和综述、点云地图构建方法设计等内容，如表\ref{tab:related_projects}所示。
-通过参与这些科研项目，申请人掌握了开放环境下点云处理和自适应分析的基础理论和技术手段，具备了项目规划和执行的实际经验，初步具备了独立开展本项目的能力，相信在国家自然科学基金委的资助下，能够解决项目中的难点问题和技术挑战，按计划推进各项研究内容，实现预期研究成果。
+如表\ref{tab:related_projects}所示，申请人读博士期间参与了和本课题相关的项目，比如《基于模块拼接的群智SLAM关键问题研究》和《高精点云地图构建与视觉定位导航方法研究》，在项目中负责文献调研和综述、点云地图构建方法设计、代码实现等内容。
+通过深度参与这些科研项目，申请人对项目生命周期中的关键节点有了全面了解，掌握了开放环境下点云处理和自适应分析的基础理论和技术手段，初步具备了独立承担项目的能力，相信在国家自然科学基金委的资助下，能够攻克本项目中的关键科学问题和技术挑战，按计划推进各项研究内容，取得预期研究成果。
 
 \begin{table}[ht]
    \centering
-   \caption{\textbf{申请人参与的相关项目}}
+   \caption{\textbf{申请人参与过的与本课题相关项目}}
    \scriptsize
-   \begin{tabular}{l c c}
+   \begin{tabular}{c c c}
     \toprule
       \textbf{项目来源} & \textbf{项目名称} & \textbf{申请人角色} \\
       \midrule
-      \multirow{2}{*}{公安部重点实验室} & \multirow{2}{*}{《高精点云地图构建与视觉定位导航方法研究》} & 文献调研、研究现状综述 \\
-      & & 点云地图构建方法设计和实现 \\
-      \midrule
       \multirow{2}{*}{国家自然科学基金委} & \multirow{2}{*}{《基于模块拼接的群智SLAM关键问题研究》} & 文献调研、研究现状综述 \\
       & & SLAM地图构建方法设计和实现 \\
-    \bottomrule
+      \midrule
+      \multirow{2}{*}{公安部重点实验室} & \multirow{2}{*}{《高精点云地图构建与视觉定位导航方法研究》} & 文献调研、研究现状综述 \\
+      & & 点云地图构建方法设计和实现 \\
+      \bottomrule
     \end{tabular}
     \label{tab:related_projects}
 \end{table}
 
-\subsection{研究工作获奖}
+\subsection{研究工作获奖情况}
 
-申请人在空间智能和3D点云处理方面的科研工作获得了多项重要奖励，
-包括：Google Travel Grant，
-博士生国家奖学金，
-中国人民大学优秀博士论文，
+申请人读博士期间在3D点云理解方面的科研工作获得了多项重要奖励，
+包括：
+博士研究生国家奖学金，
+Google Travel Grant，
 NeurIPS Scholar Award，
+中国人民大学优秀博士论文，
 中国人民大学优秀博士毕业生。
-这些初步研究中取得的成果为本项目取得进一步的创新性成果打下了坚实的基础。
+其中，Google Travel Grant 是 Google 公司设立的用于资助在顶级国际会议发表论文的优秀研究生参会的奖学金，NeurIPS Scholar Award 是 NeurIPS 基金会设立的用于资助在 NeurIPS 发表论文的优秀研究生参会的奖学金。
+这些科研奖励表明申请人的研究基础扎实，前期工作成果优异。
 
 \begin{figure}[htbp]
      \centering
@@ -746,7 +757,7 @@ NeurIPS Scholar Award，
      % Second Image
      \begin{subfigure}[b]{0.32\textwidth}
          \centering
-         \includegraphics[width=\textwidth]{google_travel_grant.pdf}
+         \includegraphics[width=\textwidth]{google_travel_grant.png}
         %  \caption{Description of second image}
          \label{fig:image2}
      \end{subfigure}
