@@ -145,70 +145,6 @@ Research on Test-time Adaptation for 3D Point Cloud Analysis in Open World
 （2）在此基础上，研究在线捕获点云测试数据分布特性的方法，动态分析并掌握测试数据特点是模型在未知环境进行自适应调整的重要依据；
 （3）在此基础上，探讨训练好的点云感知模型在推理和部署阶段的测试时自适应策略，以实现更好的测试时准确性、鲁棒性、泛化性。
 
-
-
-\subsection{国内外研究现状}
-% 从这几方面展开，提供参考文献
-% 讲开放环境点云处理
-%   讲明白过去的范式是怎么样的？特定数据集上训练模型，特定数据集上测试
-%   讲明白现在朝着开放世界模型走？
-%   存在的问题：鲁棒性/泛化性差/效率低
-2017年，以PointNet~\cite{qi17pointnet,qi17pointnet2}为代表的深度点云处理方法横空出世，它们在点云物体识别、语义分割等
-任务上的性能大幅超越人工特征工程和传统机器学习方法，（用ModelNet举例子，比传统方法好多少）。经过多年的发展，深度点云处理方法在
-特定数据集（封闭设定）的性能趋于饱和（给出具体例子+图表，发表了多少篇论文，性能增益不到 6\%），
-从2022年开始，越来越多的工作关注开放环境下点云处理问题，比如开放词表的点云识别~\cite{zhang22pointclip,zhu23pointclip2,xue23ulip,xue24ulip2,liu23openshape,zhou24uni3d}、
-物体检测~\cite{zeng23clip2,zhu23pointclip2,lu23ov3det,cao23coda,yang24imov3d,cao25codav2}、语义分割，
-当前该领域的研究重点已经从封闭数据集的设定迈向开放环境，且逐渐成为国内外一个前沿研究问题。
-
-% 进一步讲开放环境的点云理解现状，存在什么问题
-%   存在的挑战一句话就说完了，得扩充和丰富
-但当前点云处理方法未能良好应对开放环境下的种种挑战，模型的准确性和鲁棒性非常脆弱（这里要举例子，至少目前看到这么多点云识别/检测的例子，准确性只有那么点），
-不能满足实际应用需求。例如，当前最好的开放词表的点云物体检测模型 CoDA v2~\cite{cao25codav2}，在公开的ScanNet数据集上的平均精度 mean Average Precision (mAP@IoU$_{25}$) 仅为 22.72\%，
-而在封闭数据集上训练的3DETR~\cite{misra213detr}模型在ScanNet的 mAP@IoU$_{25}$ 达到62.7\%，当前经过封闭数据训练的最佳方法Dest~\cite{wang25dest}在ScanNet达到了 78.3\% mAP@IoU$_{25}$ 的检测精度，领先CoDA v2 55.58\%个绝对点。
-
-% 讲本项目思路
-%   解释本项目涉及到的关键技术，就是下面列的
-针对这些问题，本项目提出开放环境下基于缓存模型的测试时自适应点云分析方法，致力于提升开放环境下点云分析方法的鲁棒性和泛化能力。
-
-\myEmph{上一段和下一段逻辑连贯性不好，尤其是下一段开头，在上面已经讲过了}
-
-% 讲测试时自适应
-%   讲主要思想，这要结合文献
-尽管模型在训练阶段要尽可能学习各种情况，但现实世界是千变万化的，总有些新的数据特性在测试和部署阶段出现，
-此时训练好的模型不再具备大规模重训练可行性，对于测试环境的应变能力和自适应能力显得尤为重要。
-而测试时自适应技术旨在让模型在线运行时具备适应测试环境或根据测试数据特点调整自身预测的能力~\cite{yeo23rna}。
-%   讲技术分类，也要总结文献
-测试时自适应技术可大致分为两类，一类是需要根据测试样本调整预训练模型参数的~\cite{schneider20improving,wang21tent,zhang21adaptive,zhang22memo,shu22tpt,feng23difftpt,niu23towards,chen22adacontrastive,zhao2024rlcf}，另外一类是免训练的~\cite{wang24bftt3d,karmanov24tda,zanella24meanshift,farina24zero,sun25pointcache,tamjidi2025uniadapter}。在第一大类方法中，有调整BN层统计信息的~\cite{schneider20improving,wang21tent,zhang22memo}，有调整提示词的~\cite{shu22tpt,feng23difftpt}，还有调整模型其他部分参数（如图像编码器）的~\cite{zhang21adaptive,chen22adacontrastive,zhao2024rlcf}；在第二大类方法中，大部分是基于缓存模型的~\cite{wang24bftt3d,karmanov24tda,sun25pointcache,tamjidi2025uniadapter}，还有些经过理论推导进行数值变换的~\cite{zanella24meanshift,farina24zero}。
-
-% 讲缓存模型——测试时自适应方法的一种
-%   讲主要思想，就这一句话吗？不止这样吧，没把精华讲出来
-缓存模型通过存储典型样本数据为模型在评测和部署时作参考。
-%   讲技术路线分类？
-这种思路和技术手段已在多种任务重得到体现和应用，比如语言建模~\cite{vinyals16mn,grave17unbounded,merity17pointer,khandelwal20generalization}、图像识别~\cite{vinyals16mn,snell17prototypical,finn17maml,chen18a,chen21meta-baseline,choi22improving,iwasawa21t3a,zhang22tip-adapter,zhang23cafo,karmanov24tda}、点云处理~\cite{zhang23pointnn,tang24pointpeft,sun25pointcache,wang24bftt3d,tamjidi2025uniadapter}。
-%   讲本文如何看待缓存模型  ->  检索增强范式
-
-% 讲存在的问题？
-%   评述总结，该把这部分写出来了，不能磨了
-%   1. TTA 存在很多假设，限制了实际应用
-%   2. TTA 效率低，不能实时运行
-%   3. 缓存模型依赖训练数据构建
-然而，当前的测试时自适应点云分析方法面临以下几方面挑战：
-%   分别对应后面的主要研究内容
-%   最后一定要有对挑战的总结描述
-\begin{itemize}
-    \item 当前测试时自适应点云分析方法大多限定在封闭数据集设置，仅能处理训练过程已经见过的物体和场景类型，不具备应对开放环境的自适应能力。
-    \item 当前测试时自适应点云分析方法依赖大规模训练数据构建缓存，但是模型测试和部署阶段获取大量训练数据不太实际，而且测试数据展示的特性和训练数据可能很不相同，导致这类方法的鲁棒性和泛化能力较弱，且运行效率不高，难以投入实际应用。
-    \item 当前开放环境下测试时自适应点云分析方法的研究处于早期阶段，基础理论尚不完备，关键方法和技术路线尚不成熟。
-\end{itemize}
-
-综上所述，开放环境下测试时点云处理的研究处于起步阶段，相关基础理论有待发展，对应技术路径亟待验证。本项目计划从理论和实践两个维度展开研究：
-
-（1）从理论角度出发，开放环境下测试时自适应点云分析方法理论框架尚不清晰。
-
-（2）从应用角度出发，缓存模型构建和更新不够准确和高效。
-
-（3）从应用角度出发，开放环境下基于缓存模型的测试时自适应点云分析方法未形成体系。
-
 \subsection{本人具备的研究基础}
 
 本人博士期间围绕3D点云处理的准确性、运行效率、鲁棒性和泛化性进行深入研究，广泛阅读了领域文献，熟悉并掌握了主要技术路径和方法，提出了系列创新方案，以第一作者身份围绕该主题发表了5篇顶级国际会议和期刊论文~\cite{sun25pointcache,sun24point-prc,sun25vsformer,sun24ppt3d,sun23vipformer}，初步具备了执行本项目的研究基础和实践经验。
@@ -217,7 +153,7 @@ Research on Test-time Adaptation for 3D Point Cloud Analysis in Open World
 % 研究基础总结
 本人将充分利用这些工作积累，深入研究开放环境下3D点云模型测试时自适应问题，努力突破其中的关键科学问题和技术挑战，给出适合3D点云大模型自适应部署的理论和实践方案，为Spatial AI的发展贡献力量。本项目预期产出的研究成果对于3D场景重建、3D物体生成、3D物体配准、VR/AR等领域也具有重要参考价值。
 
-\subsection{国内外相关工作}
+\subsection{国内外研究现状和分析}
 
 \textbf{开放环境下3D点云处理}
 % 从哪讲起呢？把事情发展的原委讲出来，配上自身评述
@@ -226,18 +162,18 @@ Research on Test-time Adaptation for 3D Point Cloud Analysis in Open World
 
 % 怎么和上述概览的逻辑接起来
 %   介绍典型任务分类
-开放环境下3D点云处理典型的任务包括3D点云识别~\cite{zhang22pointclip,zhu23pointclip2,sun25pointcache,sun24point-prc,sun24ppt3d,xue23ulip,xue24ulip2,liu23openshape,zhou24uni3d}、
+开放环境下3D点云处理典型的任务包括点云识别~\cite{zhang22pointclip,zhu23pointclip2,sun25pointcache,sun24point-prc,sun24ppt3d,xue23ulip,xue24ulip2,liu23openshape,zhou24uni3d}、
 % PointCLIP~\cite{zhang22pointclip},Point-Cache~\cite{sun25pointcache}, Point-PRC~\cite{sun24point-prc}, PPT~\cite{sun24ppt3d}, ULIP~\cite{xue23ulip}, ULIP-2~\cite{xue24ulip2}, OpenShape~\cite{liu23openshape}, Uni3D~\cite{zhou24uni3d}
-3D点云物体检测~\cite{zeng23clip2,zhu23pointclip2,lu23ov3det,yang24imov3d,cao23coda,cao25codav2}、
+点云物体检测~\cite{zeng23clip2,zhu23pointclip2,lu23ov3det,yang24imov3d,cao23coda,cao25codav2}、
 % CLIP2~\cite{zeng23clip2} (Clip2: Contrastive language-image point pretraining from real-world point cloud data), PointCLIP V2~\cite{zhu23pointclip2}, OV-3DET~\cite{lu23ov3det}, ImOV3D~\cite{yang24imov3d}, CoDA~\cite{cao23coda}, CoDA v2~\cite{cao25codav2}
-3D点云语义分割~\cite{jiang24ov3d,kolodiazhnyi2024oneformer3d,zhou2025pointsam,rusnak25haec,boudjoghra2025openyolo3d}等。
+点云语义分割~\cite{jiang24ov3d,kolodiazhnyi2024oneformer3d,zhou2025pointsam,rusnak25haec,boudjoghra2025openyolo3d}等。
 % OV3D: Open-Vocabulary 3D Semantic Segmentation with Foundation Models~\cite{jiang24ov3d}
 % OneFormer3D~\cite{kolodiazhnyi2024oneformer3d}, 
 % Point-SAM~\cite{zhou2025pointsam}, 
 % HAECcity~\cite{rusnak25haec}
 % Open YOLO 3D~\cite{boudjoghra2025openyolo3d}, 
 %   总结每类任务特点 有什么特点呢？这就要自己琢磨了
-这几类任务起来有很大差异，从数据规模和复杂度层面，3D点云识别涉及到物体级的点云数据，规模和复杂度相对较小，而3D物体检测和语义分割要处理场景级的点云数据，规模和复杂度较大，因此不同任务的处理方法也有较大差异。
+这几类任务比较起来有很大差异，从数据规模和复杂度层面，3D点云识别涉及到物体级的点云数据，规模和复杂度相对较小，而3D物体检测和语义分割要处理场景级的点云数据，规模和复杂度较大，因此不同任务的处理方法也有较大差异。
 
 %   评述这些工作与本项目的联系和区别
 然而，上述开放集合的点云处理方法缺乏自适应能力，无法根据测试环境特点作出自适应调整，极大限制了3D点云处理方法在开放环境和真实世界的部署应用。本项目正是针对这种缺陷，研究开放环境下3D点云处理的自适应方法，让3D模型能够高效的根据测试数据特点调整自身预测，从而改善模型的准确性和鲁棒性。
@@ -254,7 +190,7 @@ Research on Test-time Adaptation for 3D Point Cloud Analysis in Open World
 %       2. 依赖庞大训练集构建pipeline
 %       3. 未利用测试数据分布
 
-测试时自适应技术在图像处理领域已经得到体现和应用。早期的图像处理测试时自适应技术应用在图像单一模态~\cite{liang20shot,liang22source,wang21tent,zhang22memo,sun20ttt,liu21ttt++,gandelsman22ttt-mae,iwasawa21t3a,zhang22memo}，由于未引入灵活的语言模态，这类方法只能在封闭数据集上进行图像识别，不具备在真实开放世界中进行图像处理的能力。近年来，测试时自适应技术与主流视觉-语言模型结合，掀起了开放环境下多模态大模型测试时自适应方法研究的浪潮~\cite{shu22tpt,feng23difftpt,tsai24gda,karmanov24tda,zanella24meanshift,farina24zero,guan2025sca,cha2025snap}，这些工作大大突破了封闭数据集合的设定，使得视觉-语言多模态模型更加贴近实际应用。
+测试时自适应技术在图像处理领域已经得到体现和应用。早期的图像处理测试时自适应技术应用在图像单一模态~\cite{liang20shot,liang22source,wang21tent,zhang22memo,sun20ttt,liu21ttt++,gandelsman22ttt-mae,iwasawa21t3a,zhang22memo}，由于未引入灵活的语言模态，这类方法只能在封闭数据集上进行图像识别，不具备在真实开放世界中进行图像识别的能力。近年来，测试时自适应技术与主流视觉-语言模型结合，掀起了开放环境下多模态大模型测试时自适应方法研究的浪潮~\cite{shu22tpt,feng23difftpt,tsai24gda,karmanov24tda,zanella24meanshift,farina24zero,guan2025sca,cha2025snap}，这些工作大大突破了封闭数据集的设定，使得视觉-语言多模态模型更加贴近实际应用。
 
 % ====== 2D TTA: uni-modal, close set ======
     % Memo~\cite{zhang22memo}
@@ -282,7 +218,7 @@ Research on Test-time Adaptation for 3D Point Cloud Analysis in Open World
 
     % Zero~\cite{farina24zero}, SCA~\cite{guan2025sca}, SNAP~\cite{cha2025snap}
 
-与在图像处理领域的探索相比，3D点云测试时自适应技术起步较晚，相关研究仍属于早期阶段。当前的技术流派可大致划分为三大类：第一类是基于小模型的方法~\cite{mirza23mate,wang24bftt3d,shim24cloudfixer}，这类方法首先仅局限于点云模态，缺乏开放集合的3D点云处理能力，其次由于模型本身能力有限，虽有测试时自适应技术加持，但展现的准确性和泛化能力不够；第二类是基于多模态大模型的方法~\cite{sun25pointcache,tamjidi2025uniadapter}，这类方法虽然能进行开放集合的点云处理，但是没有充分利用测试数据的分布特性（前/后面这段话是 **placehoder**），导致模型在现实世界测试和部署时鲁棒性和泛化能力仍不理想。
+与在图像处理领域的探索相比，3D点云感知测试时自适应技术起步较晚，相关研究仍属于早期阶段。当前的技术流派可大致划分为三大类：第一类是基于小模型的方法~\cite{mirza23mate,wang24bftt3d,shim24cloudfixer}，这类方法首先局限于单一点云模态，缺乏开放集合的3D点云处理能力，其次由于模型本身能力有限，虽有测试时自适应技术加持，但展现的准确性和泛化能力不够；第二类是基于多模态大模型的方法~\cite{sun25pointcache,tamjidi2025uniadapter}，这类方法虽然能进行开放集合的点云处理，但是没有充分考虑测试数据的分布特性，导致模型无法很好适应测试环境，在现实世界测试和部署时鲁棒性和泛化能力仍不理想。
 
 % ====== 3D TTA ======
 % MATE, BFTT3D, CloudFixer, Point-Cache, Uni-Adapter
@@ -321,7 +257,7 @@ Research on Test-time Adaptation for 3D Point Cloud Analysis in Open World
 %   每类有什么特点，和本项目的联系区别在哪？这是要害
 然而，当前的缓存模型还存在一些明显问题，比如（1）缓存模型的建立依赖大规模训练数据，但模型在测试和部署阶段不太可能再去获取和访问大量这样的数据；（2）缓存模型建立之后，缺乏数据样本动态更新机制，这种静态的缓存数据不能反映测试阶段数据的特性和分布，降低缓存模型的参考价值；（3）缓存模型的设计比较粗糙，对于复杂精细数据的刻画和存储能力有待提升。
 
-这些问题限制了缓存模型与测试时自适应方法的有效结合，使得基于缓存模型的3D点云自适应分析成为一大技术难点。为此，本项目提出了开放环境下基于测试时分层缓存模型的3D点云自适应分析解决方案，该方案设计的缓存模型（1）能够在线捕捉测试数据的分布特性，
+这些问题限制了缓存模型与测试时自适应方法的有效结合，使得基于缓存模型的3D点云自适应分析成为一大技术难点。为此，本项目提出了基于测试时分层缓存模型的开放环境下3D点云感知自适应解决方案，该方案设计的缓存模型（1）能够在线捕捉测试数据的分布特性，
 （2）引入了基于信息熵的选择机制动态更新缓存数据，使得缓存数据始终能反映最新数据特性，为模型整体决策提供更好参考，（3）针对3D点云数据开发了层次化样本特性表征方法，不仅记录样本整体特征，还记录样本多种局部信息，使得缓存模型更加精细准确。
 
 
@@ -349,13 +285,12 @@ Research on Test-time Adaptation for 3D Point Cloud Analysis in Open World
 
 针对开放环境下点云感知方法面临的缺乏开放环境语义理解能力、未能有效分析和利用测试数据分布特点、缺乏系统性测试时自适应策略等关键技术挑战，本项目计划设置层层递进的三方面研究内容，本项目的研究内容框架呈现在图\figref{fig:teaser}。
 
-% \begin{figure}[ht]
-% 	\centering
-%     \begin{overpic}[width=0.8\columnwidth]{framework.pdf}
-%     \end{overpic}
-%     \caption{本项目主要研究内容。
-%     }\label{fig:teaser}
-% \end{figure}
+\begin{figure}[t]
+	\centering
+    \includegraphics[width=\columnwidth]{figures/research_framework.pdf}
+    \caption{本项目研究内容整体框架。}
+    \label{fig:teaser}
+\end{figure}
 
 % 段落写作思路
 %   总结研究点
